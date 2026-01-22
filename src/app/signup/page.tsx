@@ -17,7 +17,7 @@ export default async function SignUpPage() {
                 {/* Header */}
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-3">
-                        Welcome to Creed Academy
+                        Welcome to Keek institutee
                     </h1>
                     <p className="text-lg text-muted-foreground">
                         Discover your perfect tech career path with our AI-powered assessment

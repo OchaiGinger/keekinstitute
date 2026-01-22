@@ -15,7 +15,7 @@ const Navbar = async () => {
                         <div className="bg-blue-600 text-white p-2 rounded-lg">
                             <span className="font-bold text-base">CA</span>
                         </div>
-                        <span className="font-bold text-lg hidden sm:inline">Creed Academy</span>
+                        <span className="font-bold text-lg hidden sm:inline">Keek institute</span>
                     </Link>
 
                     {/* Navigation Links - Centered */}

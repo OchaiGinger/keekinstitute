@@ -13,11 +13,11 @@ export default function DashboardNavbar() {
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <Image
                     src="/logo.svg"
-                    alt="Creed Academy"
+                    alt="Keek institute"
                     width={32}
                     height={32}
                 />
-                <span className="font-semibold text-lg hidden sm:inline">Creed Academy</span>
+                <span className="font-semibold text-lg hidden sm:inline">Keek institute</span>
             </Link>
 
             <div className="flex items-center gap-4">

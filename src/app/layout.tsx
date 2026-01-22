@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Creed Academy",
-  description: "Discover your perfect tech career path with Creed Academy",
+  title: "Keek institute",
+  description: "Discover your perfect tech career path with Keek instituteeee",
 };
 
 export default function RootLayout({
