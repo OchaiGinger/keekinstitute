@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { ClerkProvider } from '@clerk/nextjs'
 import ConvexClientProvider from '@/components/providers/ConvexClientProvider'
+import { ToastProvider } from '@/components/providers/toaster-provider'
 import Navbar from "@/components/Navbar";
 
 
@@ -35,6 +36,7 @@ export default function RootLayout({
       >
         <ClerkProvider>
           <ConvexClientProvider>
+            <ToastProvider />
             <Navbar />
             <main>
               {children}

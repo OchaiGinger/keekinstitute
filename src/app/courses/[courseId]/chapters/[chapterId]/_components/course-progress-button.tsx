@@ -1,10 +1,11 @@
 "use client";
 
-import axios from "axios";
 import { CheckCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 import { Button } from "@/components/ui/button";
 import { useConfettiStore } from "@/hooks/use-confetti-store";
@@ -12,6 +13,7 @@ import { useConfettiStore } from "@/hooks/use-confetti-store";
 interface CourseProgressButtonProps {
   chapterId: string;
   courseId: string;
+  userId: string;
   isCompleted?: boolean;
   nextChapterId?: string;
 };
@@ -19,19 +21,22 @@ interface CourseProgressButtonProps {
 export const CourseProgressButton = ({
   chapterId,
   courseId,
+  userId,
   isCompleted,
   nextChapterId
 }: CourseProgressButtonProps) => {
   const router = useRouter();
   const confetti = useConfettiStore();
   const [isLoading, setIsLoading] = useState(false);
+  const recordProgress = useMutation(api.progress.recordProgress);
 
   const onClick = async () => {
     try {
       setIsLoading(true);
 
-      await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
-        isCompleted: !isCompleted
+      await recordProgress({
+        userId: userId as any,
+        chapterId: chapterId as any,
       });
 
       if (!isCompleted && !nextChapterId) {

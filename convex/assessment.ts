@@ -1,6 +1,27 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
+/* ============ CLEANUP - DELETE BAD DOCUMENTS ============ */
+export const cleanupOldAssessments = mutation({
+    args: {},
+    handler: async (ctx) => {
+        // This removes old assessments with extra fields
+        const assessments = await ctx.db.query("assessments").collect();
+        let deletedCount = 0;
+        
+        for (const assessment of assessments) {
+            // Check if document has extra fields like authUserId, score, percentage
+            const doc = assessment as any;
+            if (doc.authUserId || doc.score || doc.percentage || doc.totalQuestions) {
+                await ctx.db.delete(assessment._id);
+                deletedCount++;
+            }
+        }
+        
+        return { deletedCount };
+    },
+});
+
 /* ---------------- SUBMIT / RETAKE ASSESSMENT ---------------- */
 export const submitAssessment = mutation({
     args: {
@@ -97,15 +118,4 @@ export const deleteLatestAssessmentByUserId = mutation({
     },
 });
 
-export const getLatestAssessmentByAuthId = query({
-    args: { authUserId: v.string() },
-    handler: async (ctx, args) => {
-        const assessments = await ctx.db.query("assessments").collect();
-
-        return (
-            assessments
-                .filter(a => a.authUserId === args.authUserId)
-                .sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0))[0] ?? null
-        );
-    },
-});
+/* No longer needed - use getLatestAssessmentByUserId instead */

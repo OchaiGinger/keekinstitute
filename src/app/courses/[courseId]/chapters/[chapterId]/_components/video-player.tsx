@@ -1,11 +1,12 @@
 "use client";
 
-import axios from "axios";
 import MuxPlayer from "@mux/mux-player-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Loader2, Lock } from "lucide-react";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 import { cn } from "@/lib/utils";
 import { useConfettiStore } from "@/hooks/use-confetti-store";
@@ -14,16 +15,18 @@ interface VideoPlayerProps {
     playbackId?: string | null;
     courseId: string;
     chapterId: string;
+    userId: string;
     nextChapterId?: string;
     isLocked: boolean;
     completeOnEnd: boolean;
     title: string;
-  }
+}
 
 export const VideoPlayer = ({
     playbackId,
     courseId,
     chapterId,
+    userId,
     nextChapterId,
     isLocked,
     completeOnEnd,
@@ -32,12 +35,14 @@ export const VideoPlayer = ({
     const [isReady, setIsReady] = useState(false);
     const router = useRouter();
     const confetti = useConfettiStore();
+    const recordProgress = useMutation(api.progress.recordProgress);
 
     const onEnd = async () => {
         try {
             if (completeOnEnd) {
-                await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
-                    isCompleted: true,
+                await recordProgress({
+                    userId: userId as any,
+                    chapterId: chapterId as any,
                 });
 
                 if (!nextChapterId) {

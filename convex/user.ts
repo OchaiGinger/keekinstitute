@@ -7,14 +7,18 @@ export const create = mutation({
         authUserId: v.string(),
         email: v.string(),
         name: v.optional(v.string()),
+        role: v.optional(v.union(v.literal("admin"), v.literal("instructor"), v.literal("student"))),
     },
     handler: async (ctx, args) => {
-        await ctx.db.insert("users", {
+        const _id = await ctx.db.insert("users", {
             authUserId: args.authUserId,
             email: args.email,
             name: args.name,
+            role: args.role || "student", // Default to student
+            onboardingCompleted: false,
             createdAt: Date.now(),
         });
+        return _id;
     },
 });
 
@@ -28,11 +32,53 @@ export const getByAuthId = query({
     },
 });
 
+// ------------------- GET SAFE PROFILE (for layouts) -------------------
+export const getSafeProfile = query({
+    args: { authUserId: v.string() },
+    handler: async (ctx, args) => {
+        const users = await ctx.db.query("users").collect();
+        const user = users.find((u) => u.authUserId === args.authUserId);
+
+        if (!user) {
+            return null;
+        }
+
+        return {
+            _id: user._id,
+            authUserId: user.authUserId,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            onboardingCompleted: user.onboardingCompleted,
+        };
+    },
+});
+
+// ------------------- GET USERS BY ROLE -------------------
+export const getByRole = query({
+    args: { role: v.union(v.literal("admin"), v.literal("instructor"), v.literal("student")) },
+    handler: async (ctx, args) => {
+        const users = await ctx.db.query("users").collect();
+        return users.filter((u) => u.role === args.role);
+    },
+});
+
+// ------------------- GET USER BY EMAIL -------------------
+export const getByEmail = query({
+    args: { email: v.string() },
+    handler: async (ctx, args) => {
+        const users = await ctx.db.query("users").collect();
+        return users.find((u) => u.email === args.email) ?? null;
+    },
+});
+
 // ------------------- COMPLETE ONBOARDING -------------------
 export const completeOnboarding = mutation({
     args: {
         authUserId: v.string(),
+        email: v.string(),
         name: v.string(),
+        role: v.optional(v.union(v.literal("admin"), v.literal("instructor"), v.literal("student"))),
     },
     handler: async (ctx, args) => {
         // Try to find existing user (without requiring an index)
@@ -42,21 +88,52 @@ export const completeOnboarding = mutation({
         if (user) {
             await ctx.db.patch(user._id, {
                 name: args.name,
+                role: args.role || user.role,
                 onboardingCompleted: true,
                 onboardingCompletedAt: Date.now(),
             });
-            return { updated: true };
+            return { updated: true, userId: user._id };
         }
 
         // If no user exists, create and mark onboarding complete
-        await ctx.db.insert("users", {
+        const _id = await ctx.db.insert("users", {
             authUserId: args.authUserId,
+            email: args.email,
             name: args.name,
+            role: args.role || "student",
             onboardingCompleted: true,
             onboardingCompletedAt: Date.now(),
             createdAt: Date.now(),
         });
 
-        return { created: true };
+        return { created: true, userId: _id };
+    },
+});
+
+// ------------------- UPDATE INSTRUCTOR PROFILE -------------------
+export const updateInstructorProfile = mutation({
+    args: {
+        authUserId: v.string(),
+        specialization: v.string(),
+        bio: v.optional(v.string()),
+        qualifications: v.optional(v.string()),
+        yearsOfExperience: v.optional(v.number()),
+    },
+    handler: async (ctx, args) => {
+        const users = await ctx.db.query("users").collect();
+        const user = users.find((u) => u.authUserId === args.authUserId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        await ctx.db.patch(user._id, {
+            specialization: args.specialization,
+            bio: args.bio,
+            qualifications: args.qualifications,
+            yearsOfExperience: args.yearsOfExperience,
+        });
+
+        return { updated: true, userId: user._id };
     },
 });

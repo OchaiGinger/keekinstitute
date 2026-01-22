@@ -9,7 +9,12 @@
  */
 
 import type * as assessment from "../assessment.js";
+import type * as attachments from "../attachments.js";
+import type * as categories from "../categories.js";
+import type * as chapters from "../chapters.js";
+import type * as courses from "../courses.js";
 import type * as onboarding from "../onboarding.js";
+import type * as progress from "../progress.js";
 import type * as user from "../user.js";
 
 import type {
@@ -20,7 +25,12 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   assessment: typeof assessment;
+  attachments: typeof attachments;
+  categories: typeof categories;
+  chapters: typeof chapters;
+  courses: typeof courses;
   onboarding: typeof onboarding;
+  progress: typeof progress;
   user: typeof user;
 }>;
 
