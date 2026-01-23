@@ -4,6 +4,27 @@ import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useMutation } from "convex/react";
+import { api } from "@/../convex/_generated/api";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Checkbox } from "@/components/ui/checkbox";
+
+const formSchema = z.object({
+  isPublished: z.boolean().optional(),
+  isFree: z.boolean().optional(),
+});
 
 interface ChapterAccessFormProps {
   initialData: {
@@ -12,7 +33,7 @@ interface ChapterAccessFormProps {
   };
   courseId: string;
   chapterId: string;
-};
+}
 
 export const ChapterAccessForm = ({
   initialData,
@@ -20,8 +41,35 @@ export const ChapterAccessForm = ({
   chapterId
 }: ChapterAccessFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  const updateChapter = useMutation(api.chapters.update);
+  const router = useRouter();
 
   const toggleEdit = () => setIsEditing((current) => !current);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      isPublished: initialData.isPublished || false,
+      isFree: initialData.isFree || false,
+    },
+  });
+
+  const { isSubmitting, isValid } = form.formState;
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await updateChapter({
+        chapterId: chapterId as any,
+        isPublished: values.isPublished,
+        isFree: values.isFree,
+      });
+      toast.success("Chapter access updated");
+      toggleEdit();
+      router.refresh();
+    } catch {
+      toast.error("Failed to update chapter access");
+    }
+  };
 
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4 dark:bg-gray-800">
@@ -33,34 +81,79 @@ export const ChapterAccessForm = ({
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              View status
+              Edit Access
             </>
           )}
         </Button>
       </div>
       {!isEditing && (
-        <p className={cn(
-          "text-sm mt-2",
-          !initialData.isPublished && "text-slate-700 italic dark:text-slate-300"
-        )}>
-          {initialData.isPublished ? (
-            <>This chapter is published</>
-          ) : (
-            <>This chapter is not published yet.</>
-          )}
-        </p>
-      )}
-      {!isEditing && (
-        <p className="text-xs text-muted-foreground mt-2">
-          {initialData.isFree ? "This chapter is free for all students" : "This chapter requires payment"}
-        </p>
+        <>
+          <p className={cn(
+            "text-sm mt-2",
+            !initialData.isPublished && "text-slate-700 italic dark:text-slate-300"
+          )}>
+            {initialData.isPublished ? (
+              <>This chapter is published</>
+            ) : (
+              <>This chapter is not published yet.</>
+            )}
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            {initialData.isFree ? "This chapter is free for all students" : "This chapter requires payment"}
+          </p>
+        </>
       )}
       {isEditing && (
-        <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
-          <p className="text-sm text-blue-900 dark:text-blue-200">
-            Chapter access features are being migrated. Please run <code className="bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded text-xs">npx convex dev</code> to complete the setup.
-          </p>
-        </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+            <FormField
+              control={form.control}
+              name="isPublished"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormLabel className="cursor-pointer">
+                    Publish this chapter
+                  </FormLabel>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="isFree"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormLabel className="cursor-pointer">
+                    Make this chapter free for all students
+                  </FormLabel>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center gap-x-2 pt-4">
+              <Button
+                disabled={!isValid || isSubmitting}
+                type="submit"
+              >
+                Save
+              </Button>
+            </div>
+          </form>
+        </Form>
       )}
     </div>
   );

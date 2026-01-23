@@ -18,7 +18,7 @@ export default async function OnboardingPage() {
 
     // If instructor has completed onboarding, redirect to instructor dashboard
     if (profile && profile.role === "instructor" && profile.onboardingCompleted) {
-        redirect("/instructor")
+        redirect("/dashboard/instructor")
     }
 
     // If any other user (student/admin) has completed onboarding, redirect to dashboard

@@ -137,3 +137,23 @@ export const updateInstructorProfile = mutation({
         return { updated: true, userId: user._id };
     },
 });
+// ------------------- UPDATE STUDENT TYPE -------------------
+export const updateStudentType = mutation({
+    args: {
+        userId: v.id("users"),
+        studentType: v.union(v.literal("IT"), v.literal("External"), v.literal("KeekInstitute")),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        await ctx.db.patch(args.userId, {
+            studentType: args.studentType,
+        });
+
+        return { updated: true, userId: args.userId };
+    },
+});

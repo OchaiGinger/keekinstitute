@@ -43,6 +43,15 @@ export const getPublished = query({
     },
 });
 
+// ------------------- GET ALL COURSES (PUBLISHED AND UNPUBLISHED) -------------------
+export const getAll = query({
+    args: {},
+    handler: async (ctx) => {
+        const courses = await ctx.db.query("courses").collect();
+        return courses.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    },
+});
+
 // ------------------- UPDATE COURSE -------------------
 export const update = mutation({
     args: {
@@ -53,6 +62,8 @@ export const update = mutation({
         price: v.optional(v.number()),
         categoryId: v.optional(v.id("categories")),
         isPublished: v.optional(v.boolean()),
+        courseType: v.optional(v.string()),
+        targetStudentType: v.optional(v.array(v.union(v.literal("IT"), v.literal("External"), v.literal("KeekInstitute")))),
     },
     handler: async (ctx, args) => {
         const { courseId, ...updates } = args;
