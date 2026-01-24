@@ -13,6 +13,7 @@ import type * as attachments from "../attachments.js";
 import type * as categories from "../categories.js";
 import type * as chapters from "../chapters.js";
 import type * as courses from "../courses.js";
+import type * as enrollments from "../enrollments.js";
 import type * as onboarding from "../onboarding.js";
 import type * as progress from "../progress.js";
 import type * as studentCategories from "../studentCategories.js";
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   categories: typeof categories;
   chapters: typeof chapters;
   courses: typeof courses;
+  enrollments: typeof enrollments;
   onboarding: typeof onboarding;
   progress: typeof progress;
   studentCategories: typeof studentCategories;

@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
+import { SignInButton, useUser } from "@clerk/nextjs";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../../../../convex/_generated/api";
+import { api } from "@/../convex/_generated/api";
 import AssessmentAnalysis from "../_components/assessment_analysis";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -90,14 +90,11 @@ export default function AssessmentAnalysisPage() {
     return (
         <div className="p-8 max-w-6xl">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold mb-2">Assessment Analysis</h1>
-                    <p className="text-muted-foreground">
-                        View your assessment results and recommended learning path
-                    </p>
-                </div>
-                <UserButton />
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold mb-2">Assessment Analysis</h1>
+                <p className="text-muted-foreground">
+                    View your assessment results and recommended learning path
+                </p>
             </div>
 
             {/* Assessment Analysis Content */}

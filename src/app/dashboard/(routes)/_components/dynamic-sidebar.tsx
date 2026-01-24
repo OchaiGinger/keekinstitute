@@ -14,12 +14,12 @@ const ROLE_ROUTES: Record<UserRole, SidebarRoute[]> = {
         {
             label: "Assessment Analysis",
             icon: BarChart3,
-            href: "/student/analysis",
+            href: "/dashboard/student/analysis",
         },
         {
             label: "Courses",
             icon: BookOpen,
-            href: "/student/courses",
+            href: "/dashboard/student/courses",
         },
     ],
     instructor: [

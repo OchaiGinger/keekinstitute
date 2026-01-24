@@ -1,10 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Use webpack instead of Turbopack
-  experimental: {
-    turbopack: false,
-  },
   images: {
     unoptimized: true, // Disable image optimization to speed up builds
     remotePatterns: [
