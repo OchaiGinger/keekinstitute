@@ -13,7 +13,7 @@ const STUDENT_ROUTES = [
     {
         icon: Compass,
         label: "Browse Courses",
-        href: "/courses",
+        href: "/dashboard/student/courses",
     }
 ]
 

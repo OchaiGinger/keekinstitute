@@ -1,56 +1,48 @@
-"use client";
+"use server";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
-import { useQuery } from "convex/react";
+import { auth } from "@clerk/nextjs/server";
+import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/../convex/_generated/api";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, ArrowRight } from "lucide-react";
 
-export default function StudentPage() {
-    const router = useRouter();
-    const { isSignedIn, user } = useUser();
-    const [localUserId, setLocalUserId] = useState<string | null>(null);
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-    // Get Convex user record
-    const userRecord = useQuery(
-        api.user.getByAuthId,
-        localUserId ? { authUserId: localUserId } : "skip"
-    );
+export default async function StudentPage() {
+    const { userId } = await auth();
 
-    // Get enrolled courses
-    const enrolledCourses = useQuery(
-        api.enrollments.getByUser,
-        userRecord?._id ? { userId: userRecord._id as any } : "skip"
-    );
+    // Protect: Only logged in users can access
+    if (!userId) {
+        return redirect("/signup");
+    }
 
-    useEffect(() => {
-        if (!isSignedIn || !user) return;
-        setLocalUserId(user.id);
-    }, [isSignedIn, user]);
+    // Get user profile and enrolled courses
+    // Note: Onboarding check is done in dashboard layout, not here
+    let userRecord: any = null;
+    let enrolledCourses: any[] = [];
 
-    useEffect(() => {
-        if (!isSignedIn || !userRecord || !localUserId) return;
-        if (userRecord === undefined) return;
+    try {
+        userRecord = await convex.query(api.user.getByAuthId, {
+            authUserId: userId,
+        });
 
-        if (userRecord === null) {
-            router.push("/onboarding");
-            return;
+        if (userRecord) {
+            enrolledCourses = await convex.query(api.enrollments.getByUser, {
+                userId: userRecord._id as any,
+            });
         }
-
-        if (!userRecord.onboardingCompleted) {
-            router.push("/onboarding");
-        }
-    }, [isSignedIn, userRecord, localUserId, router]);
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
 
     return (
         <div className="p-8 max-w-6xl">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">Welcome, {user?.firstName}!</h1>
+                <h1 className="text-3xl font-bold mb-2">Welcome, {userRecord?.name}!</h1>
                 <p className="text-muted-foreground">
                     Continue learning with your enrolled courses
                 </p>
@@ -73,11 +65,7 @@ export default function StudentPage() {
                     </Link>
                 </div>
 
-                {enrolledCourses === undefined ? (
-                    <div className="flex justify-center items-center h-40">
-                        <p className="text-muted-foreground">Loading your courses...</p>
-                    </div>
-                ) : enrolledCourses && enrolledCourses.length > 0 ? (
+                {enrolledCourses && enrolledCourses.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {enrolledCourses.map((enrollment: any) => {
                             const course = enrollment.course;

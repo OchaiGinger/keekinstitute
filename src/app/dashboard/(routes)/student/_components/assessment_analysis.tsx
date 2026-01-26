@@ -47,7 +47,7 @@ export default function AssessmentAnalysis({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Link href="/assessment">
+                    <Link href="/dashboard/student/assessment">
                         <Button>Take Assessment</Button>
                     </Link>
                 </CardContent>
@@ -137,7 +137,7 @@ export default function AssessmentAnalysis({
                             Full Analysis
                         </Button>
 
-                        <Link href="/assessment" className="flex-1">
+                        <Link href="/dashboard/student/assessment" className="flex-1">
                             <Button variant="outline" className="w-full h-9">
                                 Retake
                             </Button>

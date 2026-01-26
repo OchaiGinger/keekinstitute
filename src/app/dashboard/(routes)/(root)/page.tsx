@@ -30,14 +30,14 @@ export default function DashboardPage() {
         setRedirected(true);
         switch (userRecord.role) {
             case "admin":
-                router.replace("/admin");
+                router.replace("/dashboard/admin");
                 break;
             case "instructor":
-                router.replace("/instructor");
+                router.replace("/dashboard/instructor");
                 break;
             case "student":
             default:
-                router.replace("/student");
+                router.replace("/dashboard/student");
                 break;
         }
     }, [userRecord, router, redirected]);

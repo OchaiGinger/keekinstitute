@@ -11,7 +11,10 @@ export default defineSchema({
     onboardingCompleted: v.optional(v.boolean()),
     onboardingCompletedAt: v.optional(v.number()),
     // Student-specific fields
-    studentType: v.optional(v.union(v.literal("IT"), v.literal("External"), v.literal("KeekInstitute"))), // Student category type
+    studentType: v.optional(v.string()), // Student category type (dynamic from categories)
+    careerInterest: v.optional(v.string()), // Student's career interest
+    currentLevel: v.optional(v.union(v.literal("Beginner"), v.literal("Intermediate"), v.literal("Advanced"))), // Student's current skill level
+    learningGoals: v.optional(v.string()), // Student's learning goals
     // Instructor-specific fields
     specialization: v.optional(v.string()),
     bio: v.optional(v.string()),

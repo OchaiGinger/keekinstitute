@@ -46,9 +46,7 @@ const onboardingSchema = z.object({
 })
 
 const studentTypeSchema = z.object({
-    studentType: z.enum(["IT", "External", "KeekInstitute"], {
-        errorMap: () => ({ message: "Please select a student type" })
-    }),
+    studentType: z.enum(["IT", "External", "KeekInstitute"]),
 })
 
 type OnboardingFormData = z.infer<typeof onboardingSchema>
@@ -119,7 +117,7 @@ export default function OnboardingForm({ initialName, userEmail, clerkUserId }: 
                 } else if (userRole === "student") {
                     setStep("studentType")
                 } else {
-                    router.push("/student")
+                    router.push("/dashboard/student")
                 }
             } catch (e) {
                 console.error(e)
@@ -269,7 +267,7 @@ export default function OnboardingForm({ initialName, userEmail, clerkUserId }: 
                         userEmail={userEmail}
                         userName={form.getValues("name")}
                         onComplete={() => {
-                            router.replace("/instructor")
+                            router.replace("/dashboard/instructor")
                         }}
                     />
                 </div>
@@ -279,9 +277,9 @@ export default function OnboardingForm({ initialName, userEmail, clerkUserId }: 
                 <div className="w-full max-w-4xl">
                     <AssessmentForm onComplete={() => {
                         if (userRole === "instructor") {
-                            router.replace("/instructor")
+                            router.replace("/dashboard/instructor")
                         } else {
-                            router.replace("/student")
+                            router.replace("/dashboard/student")
                         }
                     }} />
                 </div>
