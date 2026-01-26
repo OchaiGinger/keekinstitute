@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
 
@@ -10,6 +11,7 @@ export default async function getSafeProfile() {
   try {
     // Get auth info from Clerk with timeout handling
     let authResult;
+    let clerkUser;
     try {
       authResult = await Promise.race([
         auth(),
@@ -17,6 +19,9 @@ export default async function getSafeProfile() {
           setTimeout(() => reject(new Error("Auth timeout")), 5000)
         )
       ]);
+      
+      // Also get the current user to access email
+      clerkUser = await currentUser();
     } catch (authError) {
       console.log("[getSafeProfile] Auth call failed or timed out:", (authError as Error).message);
       // Return null to let page load - Clerk will initialize on client if needed
@@ -32,6 +37,13 @@ export default async function getSafeProfile() {
       return null;
     }
 
+    // Check if user is admin by comparing email with env variable
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const userEmail = clerkUser?.emailAddresses?.[0]?.emailAddress || "";
+    const isAdmin = adminEmail && userEmail === adminEmail;
+
+    console.log("[getSafeProfile] Email check - userEmail:", userEmail, "isAdmin:", isAdmin);
+
     try {
       // Try to fetch actual user profile from Convex
       const profile = await convex.query(api.user.getSafeProfile, {
@@ -39,27 +51,38 @@ export default async function getSafeProfile() {
       });
 
       if (profile) {
-        console.log("[getSafeProfile] Found profile in Convex");
+        console.log("[getSafeProfile] Found profile in Convex with role:", profile.role);
+        
+        // Check if admin status matches
+        const expectedRole = isAdmin ? "admin" : "student";
+        if (profile.role !== expectedRole) {
+          console.log("[getSafeProfile] Role mismatch - current:", profile.role, "expected:", expectedRole);
+          // Update role in memory and return
+          // The database will be updated on next request or when mutation is available
+          profile.role = expectedRole;
+          console.log("[getSafeProfile] Updated profile role in memory to:", expectedRole);
+        }
         return profile;
       }
 
       // User not found in Convex - create them
       console.log("[getSafeProfile] User not found in Convex, creating new user...");
+      const userRole = isAdmin ? "admin" : "student";
       try {
         await convex.mutation(api.user.create, {
           authUserId: userId,
-          email: "",
-          name: "",
-          role: "student",
+          email: userEmail,
+          name: clerkUser?.firstName || "",
+          role: userRole,
         });
-        console.log("[getSafeProfile] User created successfully");
+        console.log("[getSafeProfile] User created successfully with role:", userRole);
         // Return minimal profile after creating user
         return {
           _id: "" as any,
           authUserId: userId,
-          email: "",
-          name: "",
-          role: "student",
+          email: userEmail,
+          name: clerkUser?.firstName || "",
+          role: userRole,
           onboardingCompleted: false,
         };
       } catch (createError) {
@@ -68,21 +91,22 @@ export default async function getSafeProfile() {
     } catch (convexError) {
       console.log("[getSafeProfile] Could not fetch from Convex, will try to create user");
       // Try to create user if fetch failed
+      const userRole = isAdmin ? "admin" : "student";
       try {
         await convex.mutation(api.user.create, {
           authUserId: userId,
-          email: "",
-          name: "",
-          role: "student",
+          email: userEmail,
+          name: clerkUser?.firstName || "",
+          role: userRole,
         });
-        console.log("[getSafeProfile] User created successfully");
+        console.log("[getSafeProfile] User created successfully with role:", userRole);
         // Return minimal profile after creating user
         return {
           _id: "" as any,
           authUserId: userId,
-          email: "",
-          name: "",
-          role: "student",
+          email: userEmail,
+          name: clerkUser?.firstName || "",
+          role: userRole,
           onboardingCompleted: false,
         };
       } catch (createError) {
@@ -93,12 +117,13 @@ export default async function getSafeProfile() {
     // Return a basic profile if Convex not available
     // This allows user to proceed even if Convex dev server isn't running
     console.log("[getSafeProfile] Returning minimal profile for userId:", userId);
+    const fallbackRole = isAdmin ? "admin" : "student";
     return {
       _id: "" as any,
       authUserId: userId,
-      email: "",
-      name: "",
-      role: "student",
+      email: userEmail,
+      name: clerkUser?.firstName || "",
+      role: fallbackRole,
       onboardingCompleted: false,
     };
   } catch (error) {

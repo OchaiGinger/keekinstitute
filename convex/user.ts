@@ -217,3 +217,24 @@ export const updateInstructorOnboarding = mutation({
         return { updated: true, userId: args.userId };
     },
 });
+
+// ------------------- UPDATE ROLE (for admin check) -------------------
+export const updateRole = mutation({
+    args: {
+        userId: v.id("users"),
+        role: v.union(v.literal("admin"), v.literal("instructor"), v.literal("student")),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        await ctx.db.patch(args.userId, {
+            role: args.role,
+        });
+
+        return { updated: true, userId: args.userId, newRole: args.role };
+    },
+});

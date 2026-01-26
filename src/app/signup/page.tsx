@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
-import getSafeProfile from "@/actions/get-safe-profile";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
