@@ -14,34 +14,34 @@ const ROLE_ROUTES: Record<UserRole, SidebarRoute[]> = {
         {
             label: "Assessment Analysis",
             icon: BarChart3,
-            href: "/student/analysis",
+            href: "/dashboard/student/analysis",
         },
         {
             label: "Courses",
             icon: BookOpen,
-            href: "/student/courses",
+            href: "/dashboard/student/courses",
         },
     ],
     instructor: [
         {
             label: "Courses",
             icon: BookOpen,
-            href: "/instructor",
+            href: "/dashboard/instructor",
         },
         {
             label: "Students",
             icon: Users,
-            href: "/instructor/students",
+            href: "/dashboard/instructor/students",
         },
         {
             label: "Analytics",
             icon: BarChart3,
-            href: "/instructor/analytics",
+            href: "/dashboard/instructor/analytics",
         },
         {
             label: "Profile",
             icon: Settings,
-            href: "/instructor/profile",
+            href: "/dashboard/instructor/profile",
         },
     ],
     admin: [
@@ -53,12 +53,12 @@ const ROLE_ROUTES: Record<UserRole, SidebarRoute[]> = {
         {
             label: "Analytics",
             icon: BarChart3,
-            href: "/admin/analytics",
+            href: "/dashboard/admin/analytics",
         },
         {
             label: "Settings",
             icon: Settings,
-            href: "/admin/settings",
+            href: "/dahsboard/admin/settings",
         },
     ],
 };

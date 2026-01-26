@@ -2,18 +2,17 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
-import { api } from "../../../../../../convex/_generated/api";
+import { api } from "@/../convex/_generated/api";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 
 const CoursesPage = () => {
     const { user } = useUser();
 
-    const courses = useQuery(
-        api.courses.getPublished,
-    );
+    const courses = useQuery(api.courses.getAll);
 
     return (
         <div className="p-6 space-y-6">
@@ -36,7 +35,12 @@ const CoursesPage = () => {
                     {courses.map((course) => (
                         <Card key={course._id} className="hover:shadow-lg transition-shadow">
                             <CardHeader>
-                                <CardTitle className="line-clamp-2">{course.title}</CardTitle>
+                                <div className="flex items-start justify-between gap-2">
+                                    <CardTitle className="line-clamp-2 flex-1">{course.title}</CardTitle>
+                                    <Badge variant={course.isPublished ? "default" : "secondary"}>
+                                        {course.isPublished ? "Published" : "Draft"}
+                                    </Badge>
+                                </div>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
@@ -48,9 +52,13 @@ const CoursesPage = () => {
                                             Edit
                                         </Button>
                                     </Link>
-                                    <Button variant="outline" className="flex-1">
-                                        View
-                                    </Button>
+                                    {course.isPublished && (
+                                        <Link href={`/courses/${course._id}`} className="flex-1">
+                                            <Button variant="outline" className="w-full">
+                                                View
+                                            </Button>
+                                        </Link>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>

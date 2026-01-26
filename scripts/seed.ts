@@ -31,9 +31,37 @@ async function main() {
                     throw new Error(`HTTP ${response.status}`);
                 }
 
-                console.log(`✓ Created: ${categoryName}`);
+                console.log(`✓ Created category: ${categoryName}`);
             } catch (error) {
-                console.log(`✗ Error creating ${categoryName}:`, error);
+                console.log(`✗ Error creating category ${categoryName}:`, error);
+            }
+        }
+
+        // Seed student categories
+        console.log("\n🌱 Seeding student categories to Convex...\n");
+
+        const studentCategories = [
+            { name: "IT Students", description: "Students from the IT/Computer Science department" },
+            { name: "External Students", description: "External students joining from polytechnic institutions" },
+            { name: "KeekInstitute Students", description: "Main Kee Institute students" },
+        ];
+
+        for (const studentCat of studentCategories) {
+            try {
+                // Call Convex mutation directly using HTTP
+                const response = await fetch(`${process.env.NEXT_PUBLIC_CONVEX_URL}/api/studentCategories.create`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: studentCat.name, description: studentCat.description }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                console.log(`✓ Created student category: ${studentCat.name}`);
+            } catch (error) {
+                console.log(`✗ Error creating student category ${studentCat.name}:`, error);
             }
         }
 

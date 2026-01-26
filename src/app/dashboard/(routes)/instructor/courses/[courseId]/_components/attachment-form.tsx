@@ -31,27 +31,39 @@ export const AttachmentForm = ({
   const [isEditing, setIsEditing] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
+  const createAttachment = useMutation(api.attachments.create);
   const deleteAttachment = useMutation(api.attachments.delete_);
 
   const toggleEdit = () => setIsEditing((current) => !current);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      toast.success("Course updated");
+      // Save attachment to database
+      await createAttachment({
+        courseId: initialData._id as any,
+        url: values.url,
+        originalFilename: values.originalFilename,
+      });
+      toast.success("Attachment added successfully");
       toggleEdit();
       router.refresh();
-    } catch {
-      toast.error("Something went wrong");
+    } catch (error) {
+      console.error("Error saving attachment:", error);
+      toast.error("Failed to add attachment");
     }
   };
 
   const onDelete = async (id: string) => {
     try {
       setDeletingId(id);
+      await deleteAttachment({
+        attachmentId: id as any,
+      });
       toast.success("Attachment deleted");
       router.refresh();
-    } catch {
-      toast.error("Something went wrong");
+    } catch (error) {
+      console.error("Error deleting attachment:", error);
+      toast.error("Failed to delete attachment");
     } finally {
       setDeletingId(null);
     }
@@ -84,7 +96,7 @@ export const AttachmentForm = ({
             <div className="space-y-2">
               {initialData.attachments.map((attachment) => (
                 <div
-                  key={attachment.id}
+                  key={attachment._id || attachment.id}
                   className="flex items-center p-3 w-full bg-sky-100 border-sky-200 border text-sky-700 rounded-md dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300"
                 >
                   <File className="h-4 w-4 mr-2 shrink-0" />
@@ -94,17 +106,17 @@ export const AttachmentForm = ({
                     rel="noopener noreferrer"
                     className="text-xs line-clamp-1 hover:underline"
                   >
-                    {attachment.name}
+                    {attachment.originalFilename || attachment.name}
                   </a>
-                  {deletingId === attachment.id && (
+                  {deletingId === (attachment._id || attachment.id) && (
                     <div>
                       <Loader2 className="h-4 w-4 animate-spin" />
                     </div>
                   )}
-                  {deletingId !== attachment.id && (
+                  {deletingId !== (attachment._id || attachment.id) && (
                     <button
                       title="Delete attachment"
-                      onClick={() => onDelete(attachment.id)}
+                      onClick={() => onDelete(attachment._id || attachment.id)}
                       className="ml-auto hover:opacity-75 transition"
                     >
                       <X className="h-4 w-4" />

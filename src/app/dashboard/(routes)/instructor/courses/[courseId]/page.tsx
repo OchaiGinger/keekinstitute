@@ -1,8 +1,6 @@
 "use client";
 
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { CircleDollarSign, File, LayoutDashboard, ListChecks } from "lucide-react";
+import { CircleDollarSign, File, LayoutDashboard, ListChecks, Users } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "@/../convex/_generated/api";
 import { use } from "react";
@@ -18,7 +16,8 @@ import { PriceForm } from "./_components/price-form";
 import { AttachmentForm } from "./_components/attachment-form";
 import { ChaptersForm } from "./_components/chapters-form";
 import { Actions } from "./_components/actions";
-import { useEffect } from "react";
+import { CourseTypeForm } from "./_components/course-type-form";
+import { TargetStudentTypeForm } from "./_components/target-student-type-form";
 
 const CourseIdPage = ({
   params
@@ -36,12 +35,21 @@ const CourseIdPage = ({
     courseId: courseId as any,
   } : "skip");
 
-  if (!courseId || course === undefined || categories === undefined || chapters === undefined) {
-    return <div>Loading...</div>;
+  // Show loading state while data is being fetched
+  if (course === undefined || categories === undefined || chapters === undefined) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground">Loading course...</p>
+        </div>
+      </div>
+    );
   }
 
-  if (!course) {
-    return redirect("/");
+  // Redirect if course not found
+  if (!course || !courseId) {
+    throw new Error("Course not found");
   }
 
   const requiredFields = [
@@ -111,8 +119,24 @@ const CourseIdPage = ({
                 value: category._id || category.id,
               }))}
             />
+            <CourseTypeForm
+              initialData={course}
+              courseId={course._id}
+            />
           </div>
           <div className="space-y-6">
+            <div>
+              <div className="flex items-center gap-x-2">
+                <IconBadge icon={Users} />
+                <h2 className="text-xl">
+                  Target Students
+                </h2>
+              </div>
+              <TargetStudentTypeForm
+                initialData={course}
+                courseId={course._id}
+              />
+            </div>
             <div>
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={ListChecks} />

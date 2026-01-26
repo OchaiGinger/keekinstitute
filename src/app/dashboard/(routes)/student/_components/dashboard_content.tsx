@@ -83,10 +83,10 @@ export default function DashboardContent({ userId, userName, userEmail }: Dashbo
                     <div className="border rounded-lg p-6 bg-linear-to-br from-blue-50 to-indigo-50">
                         <h3 className="font-semibold mb-4">Quick Actions</h3>
                         <div className="space-y-2">
-                            <Link href="/assessment">
+                            <Link href="/dashboard/student/assessment">
                                 <Button className="w-full">Take / Retake Assessment</Button>
                             </Link>
-                            <Link href="/courses">
+                            <Link href="/dashboard/student/courses">
                                 <Button className="w-full" variant="outline">
                                     Browse Courses
                                 </Button>

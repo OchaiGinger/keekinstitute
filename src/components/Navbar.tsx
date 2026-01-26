@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { handleGetStarted } from "@/actions/handle-get-started";
 
 const Navbar = async () => {
     const { userId } = await auth();
@@ -34,13 +35,27 @@ const Navbar = async () => {
                     {/* Right Side - Auth Actions */}
                     <div className="flex items-center gap-4">
                         {userId ? (
-                            <Button>
-                                <Link href="./onboarding">Dashboard</Link>
-                            </Button>
+                            <>
+                                <form action={handleGetStarted}>
+                                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                                        Dashboard
+                                    </Button>
+                                </form>
+                                <UserButton 
+                                    afterSignOutUrl="/"
+                                    appearance={{
+                                        elements: {
+                                            avatarBox: "h-10 w-10",
+                                        },
+                                    }}
+                                />
+                            </>
                         ) : (
-                            <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                                <Link href="/signup">Get Started</Link>
-                            </Button>
+                            <form action={handleGetStarted}>
+                                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                                    Get Started
+                                </Button>
+                            </form>
                         )}
                     </div>
                 </div>

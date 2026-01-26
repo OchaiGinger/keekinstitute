@@ -1,13 +1,18 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import getSafeProfile from "@/actions/get-safe-profile";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const dynamic = "force-dynamic";
 
 export default async function SignUpPage() {
     const { userId } = await auth();
 
     // Protect this page - only non-authenticated users can access
     if (userId) {
+        // User is logged in, redirect to dashboard
+        // Dashboard layout will check onboarding status and role
         redirect("/dashboard");
     }
 
@@ -35,7 +40,7 @@ export default async function SignUpPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <SignInButton mode="modal">
+                            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
                                 <button className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors">
                                     Sign In
                                 </button>
@@ -52,7 +57,7 @@ export default async function SignUpPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <SignUpButton mode="modal" forceRedirectUrl="/onboarding">
+                            <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
                                 <button className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors">
                                     Create Account
                                 </button>

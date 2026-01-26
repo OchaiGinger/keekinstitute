@@ -1,25 +1,48 @@
 "use client";
 import { useTheme } from "./providers/theme-provider"
-import React from "react";
+import React, { useCallback } from "react";
 import { BsMoon, BsSun } from "react-icons/bs";
 import {
-  useClerk, 
   SignedIn,
   SignedOut,
   SignInButton,
   UserButton,
+  useUser,
 } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
-import { FaArrowUp, FaUser, FaUserAlt } from "react-icons/fa";
+import { FaArrowUp, FaHome } from "react-icons/fa";
 
 export default function ThemeSwitch() {
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
+  const { user, isLoaded } = useUser();
+  const [localUserId, setLocalUserId] = React.useState<string | null>(null);
 
-  const scrollToTop = () => {
+  // Get user record from Convex to check role
+  const userRecord = useQuery(
+    api.user.getByAuthId,
+    localUserId ? { authUserId: localUserId } : "skip"
+  );
+
+  React.useEffect(() => {
+    if (!isLoaded || !user) return;
+    setLocalUserId(user.id);
+  }, [isLoaded, user]);
+
+  const scrollToTop = useCallback((): void => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
 
-  const { openSignIn } = useClerk();
+  const handleDashboardClick = useCallback((): void => {
+    if (!userRecord || !isLoaded) return;
+    
+    // Determine role and redirect accordingly
+    const role = userRecord?.role || "student";
+    router.push(`/dashboard/${role}`);
+  }, [userRecord, isLoaded, router]);
 
   return (
     <>
@@ -41,6 +64,13 @@ export default function ThemeSwitch() {
         </button>
 
         <SignedIn>
+          <button
+            title="Go to Dashboard"
+            onClick={handleDashboardClick}
+            className="bg-white w-[3rem] h-[3rem] bg-opacity-80 backdrop-blur-[0.5rem] border border-white border-opacity-40 shadow-2xl rounded-full flex items-center justify-center hover:scale-[1.15] active:scale-105 transition-all dark:bg-gray-950"
+          >
+            <FaHome />
+          </button>
           <UserButton
             afterSignOutUrl="/"
             appearance={{
@@ -52,17 +82,18 @@ export default function ThemeSwitch() {
         </SignedIn>
 
         <SignedOut>
-        <button
-          title="Sign in"
-          onClick={() => openSignIn()} 
-          className="bg-white w-[3rem] h-[3rem] bg-opacity-80 backdrop-blur-[0.5rem] border border-white border-opacity-40 shadow-2xl rounded-full flex items-center justify-center hover:scale-[1.15] active:scale-105 transition-all dark:bg-gray-950"
-        >
-          <FaUser />
-        </button>
-      </SignedOut>
+          <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+            <button
+              title="Sign in"
+              className="bg-white w-[3rem] h-[3rem] bg-opacity-80 backdrop-blur-[0.5rem] border border-white border-opacity-40 shadow-2xl rounded-full flex items-center justify-center hover:scale-[1.15] active:scale-105 transition-all dark:bg-gray-950"
+            >
+              {/* Icon placeholder - SignInButton handles the rendering */}
+              Sign In
+            </button>
+          </SignInButton>
+        </SignedOut>
 
       </div>
-
 
       
     </>

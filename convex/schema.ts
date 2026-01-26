@@ -10,6 +10,11 @@ export default defineSchema({
     role: v.union(v.literal("admin"), v.literal("instructor"), v.literal("student")), // User role
     onboardingCompleted: v.optional(v.boolean()),
     onboardingCompletedAt: v.optional(v.number()),
+    // Student-specific fields
+    studentType: v.optional(v.string()), // Student category type (dynamic from categories)
+    careerInterest: v.optional(v.string()), // Student's career interest
+    currentLevel: v.optional(v.union(v.literal("Beginner"), v.literal("Intermediate"), v.literal("Advanced"))), // Student's current skill level
+    learningGoals: v.optional(v.string()), // Student's learning goals
     // Instructor-specific fields
     specialization: v.optional(v.string()),
     bio: v.optional(v.string()),
@@ -57,6 +62,8 @@ export default defineSchema({
     categoryId: v.optional(v.id("categories")),
     price: v.optional(v.number()),
     isPublished: v.optional(v.boolean()),
+    courseType: v.optional(v.string()), // Type of course (e.g., "IT", "Business", "General")
+    targetStudentType: v.optional(v.array(v.union(v.literal("IT"), v.literal("External"), v.literal("KeekInstitute")))), // Target student types
     createdAt: v.number(),
   })
     .index("by_categoryId", ["categoryId"])
@@ -65,6 +72,13 @@ export default defineSchema({
   // ==================== CATEGORIES ====================
   categories: defineTable({
     name: v.string(),
+    createdAt: v.number(),
+  }),
+
+  // ==================== STUDENT CATEGORIES ====================
+  studentCategories: defineTable({
+    name: v.string(), // "IT Students", "External Students", "KeekInstitute Students"
+    description: v.optional(v.string()),
     createdAt: v.number(),
   }),
 

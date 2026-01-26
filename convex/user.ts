@@ -137,3 +137,83 @@ export const updateInstructorProfile = mutation({
         return { updated: true, userId: user._id };
     },
 });
+// ------------------- UPDATE STUDENT TYPE -------------------
+export const updateStudentType = mutation({
+    args: {
+        userId: v.id("users"),
+        studentType: v.union(v.literal("IT"), v.literal("External"), v.literal("KeekInstitute")),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        await ctx.db.patch(args.userId, {
+            studentType: args.studentType,
+        });
+
+        return { updated: true, userId: args.userId };
+    },
+});
+
+// ------------------- UPDATE STUDENT ONBOARDING -------------------
+export const updateStudentOnboarding = mutation({
+    args: {
+        userId: v.id("users"),
+        studentType: v.string(),
+        learningGoals: v.string(),
+        onboardingCompleted: v.boolean(),
+        onboardingCompletedAt: v.number(),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        await ctx.db.patch(args.userId, {
+            studentType: args.studentType as any,
+            learningGoals: args.learningGoals,
+            onboardingCompleted: args.onboardingCompleted,
+            onboardingCompletedAt: args.onboardingCompletedAt,
+        });
+
+        return { updated: true, userId: args.userId };
+    },
+});
+
+// ------------------- UPDATE INSTRUCTOR ONBOARDING -------------------
+export const updateInstructorOnboarding = mutation({
+    args: {
+        userId: v.id("users"),
+        fullName: v.string(),
+        specialization: v.string(),
+        bio: v.string(),
+        experience: v.string(),
+        qualifications: v.string(),
+        onboardingCompleted: v.boolean(),
+        onboardingCompletedAt: v.number(),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        await ctx.db.patch(args.userId, {
+            name: args.fullName,
+            specialization: args.specialization,
+            bio: args.bio,
+            yearsOfExperience: parseInt(args.experience, 10) || 0,
+            qualifications: args.qualifications,
+            onboardingCompleted: args.onboardingCompleted,
+            onboardingCompletedAt: args.onboardingCompletedAt,
+        });
+
+        return { updated: true, userId: args.userId };
+    },
+});
