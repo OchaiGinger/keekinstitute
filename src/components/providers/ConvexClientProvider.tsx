@@ -1,9 +1,23 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { ConvexReactClient } from 'convex/react'
+import { ConvexProviderWithClerk } from 'convex/react-clerk'
+import { useAuth } from '@clerk/nextjs'
+
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL
 
 export default function ConvexClientProvider({ children }: { children: ReactNode }) {
-  // Return children without Convex provider to prevent client-side crashes
-  // Server components can still use getConvexClient() for data fetching
-  return <>{children}</>
+  if (!convexUrl) {
+    console.warn('NEXT_PUBLIC_CONVEX_URL not set')
+    return <>{children}</>
+  }
+
+  const convex = new ConvexReactClient(convexUrl)
+
+  return (
+    <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+      {children}
+    </ConvexProviderWithClerk>
+  )
 }

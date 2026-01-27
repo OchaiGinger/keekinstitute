@@ -1,45 +1,34 @@
-"use client"
-
-import { useUser } from "@clerk/nextjs"
-import { useQuery } from "convex/react"
-import { api } from "../../../../../convex/_generated/api"
+import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
-import { Loader } from "lucide-react"
+import getSafeProfile from "@/actions/get-safe-profile"
 
-export default function AdminLayout({
+export default async function AdminLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
-    const { user, isLoaded } = useUser()
-    const profile = useQuery(
-        api.user.getSafeProfile,
-        isLoaded && user?.id ? { authUserId: user.id } : "skip"
-    )
+    try {
+        const { userId } = await auth()
+        
+        if (!userId) {
+            redirect("/sign-in")
+        }
 
-    if (!isLoaded) return null
+        const profile = await getSafeProfile()
 
-    if (!user) {
-        redirect("/sign-in")
-    }
+        if (!profile) {
+            redirect("/")
+        }
 
-    // If profile is loading (undefined), show loading state instead of redirecting
-    if (profile === undefined) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <Loader className="w-8 h-8 animate-spin text-primary" />
-                    <p className="text-muted-foreground">Loading...</p>
-                </div>
-            </div>
-        )
-    }
-
-    // If profile exists and role is not admin, redirect
-    if (profile && profile.role !== "admin") {
+        // If profile exists and role is not admin, redirect
+        if (profile.role !== "admin") {
+            redirect("/")
+        }
+    } catch (error) {
+        console.error("[AdminLayout] Error:", error)
         redirect("/")
     }
 
     // Admin layout just renders children - navbar and sidebar come from parent dashboard layout
-    return children
+    return <>{children}</>
 }

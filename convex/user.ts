@@ -264,3 +264,33 @@ export const deleteUser = mutation({
         return { deleted: true, userId: args.userId };
     },
 });
+
+// ------------------- UPDATE USER PROFILE -------------------
+export const updateUserProfile = mutation({
+    args: {
+        userId: v.id("users"),
+        updates: v.object({
+            role: v.optional(v.union(v.literal("admin"), v.literal("instructor"), v.literal("student"))),
+            name: v.optional(v.string()),
+            email: v.optional(v.string()),
+            onboardingCompleted: v.optional(v.boolean()),
+        }),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        const updates: any = {};
+        if (args.updates.role !== undefined) updates.role = args.updates.role;
+        if (args.updates.name !== undefined) updates.name = args.updates.name;
+        if (args.updates.email !== undefined) updates.email = args.updates.email;
+        if (args.updates.onboardingCompleted !== undefined) updates.onboardingCompleted = args.updates.onboardingCompleted;
+
+        await ctx.db.patch(args.userId, updates);
+
+        return { updated: true, userId: args.userId };
+    },
+});

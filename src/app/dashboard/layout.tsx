@@ -9,18 +9,23 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
+  console.log("[DashboardLayout] Starting...");
   const safeProfile = await getSafeProfile();
+  
+  console.log("[DashboardLayout] Profile:", safeProfile ? `${safeProfile.role} - onboarding: ${safeProfile.onboardingCompleted}` : "null");
 
   if (!safeProfile) {
+    console.log("[DashboardLayout] No profile, redirecting to /");
     return redirect("/");
   }
 
   // Redirect students to onboarding if they haven't completed it
-  // This must be checked at the layout level before rendering dashboard
   if (safeProfile.role === "student" && !safeProfile.onboardingCompleted) {
+    console.log("[DashboardLayout] Student without onboarding, redirecting to onboarding");
     return redirect("/dashboard/student/onboarding");
   }
   
+  console.log("[DashboardLayout] Rendering dashboard for role:", safeProfile.role);
   return (
     <div className="h-full dark:bg-gray-900">
       <div className="h-20 md:pl-56 fixed inset-y-0 w-full z-50 dark:bg-gray-900">
