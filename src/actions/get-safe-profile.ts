@@ -2,10 +2,8 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { currentUser } from "@clerk/nextjs/server";
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "../../convex/_generated/api";
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+import { api } from "@/../convex/_generated/api";
+import { getConvexClient } from "@/lib/convex-client";
 
 export default async function getSafeProfile() {
   try {
@@ -46,6 +44,7 @@ export default async function getSafeProfile() {
 
     try {
       // Try to fetch actual user profile from Convex
+      const convex = getConvexClient();
       const profile = await convex.query(api.user.getSafeProfile, {
         authUserId: userId,
       });

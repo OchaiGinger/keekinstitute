@@ -1,13 +1,12 @@
 "use server";
 
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+import { api } from "@/../convex/_generated/api";
+import { Id } from "@/../convex/_generated/dataModel";
+import { getConvexClient } from "@/lib/convex-client";
 
 export async function getUserById(userId: string) {
   try {
+    const convex = getConvexClient();
     const user = await convex.query(api.user.getById, {
       userId: userId as Id<"users">,
     });

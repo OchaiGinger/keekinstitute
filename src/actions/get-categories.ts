@@ -1,12 +1,11 @@
 "use server";
 
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "@/convex/_generated/api";
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+import { api } from "@/../convex/_generated/api";
+import { getConvexClient } from "@/lib/convex-client";
 
 export async function getCategories() {
   try {
+    const convex = getConvexClient();
     const categories = await convex.query(api.categories.getAll, {});
     return categories.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   } catch (error) {

@@ -1,11 +1,9 @@
 "use server"
 
 import { z } from "zod"
-import { ConvexHttpClient } from "convex/browser"
-import { api } from "../../../../../../convex/_generated/api"
+import { api } from "@/../convex/_generated/api"
+import { getConvexClient } from "@/lib/convex-client"
 import { auth } from "@clerk/nextjs/server"
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
 
 // Zod schema for instructor onboarding
 const instructorOnboardingSchema = z.object({
@@ -21,6 +19,7 @@ type InstructorOnboardingData = z.infer<typeof instructorOnboardingSchema>
 export async function completeInstructorOnboardingAction(data: InstructorOnboardingData) {
     try {
         const { userId } = await auth()
+        const convex = getConvexClient()
         if (!userId) {
             return { success: false, error: "Not authenticated" }
         }

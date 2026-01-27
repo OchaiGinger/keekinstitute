@@ -1,8 +1,8 @@
 "use server"
 
 import { z } from "zod"
-import { ConvexHttpClient } from "convex/browser"
-import { api } from "../../../convex/_generated/api"
+import { api } from "@/../convex/_generated/api"
+import { getConvexClient } from "@/lib/convex-client"
 
 // Zod schema for onboarding
 const onboardingSchema = z.object({
@@ -11,13 +11,13 @@ const onboardingSchema = z.object({
 
 type OnboardingFormData = z.infer<typeof onboardingSchema>
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
-
 export async function completeOnboardingAction(
     data: OnboardingFormData,
     clerkUserId: string,
     userEmail: string
 ) {
+    try {
+        const convex = getConvexClient();
     try {
         // Validate with Zod
         const validated = onboardingSchema.parse(data)

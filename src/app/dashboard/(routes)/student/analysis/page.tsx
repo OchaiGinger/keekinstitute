@@ -8,7 +8,7 @@ import AssessmentAnalysis from "../_components/assessment_analysis";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL || "");
 
 export default async function AssessmentAnalysisPage() {
     const { userId } = await auth();

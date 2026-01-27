@@ -1,15 +1,14 @@
 "use server";
 
-import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/../convex/_generated/api";
-
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+import { getConvexClient } from "@/lib/convex-client";
 
 export async function getCourses(filters?: {
   title?: string;
   categoryId?: string;
 }) {
   try {
+    const convex = getConvexClient();
     const courses = await convex.query(api.courses.getAll, {});
     // Client-side filtering based on parameters
     let filtered = courses.map(course => ({
