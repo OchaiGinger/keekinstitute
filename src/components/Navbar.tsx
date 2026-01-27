@@ -31,12 +31,6 @@ const Navbar = async () => {
                         <Link href="/courses" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
                             Courses
                         </Link>
-                        <Link href="/about" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
-                            About
-                        </Link>
-                        <Link href="/contact" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
-                            Contact
-                        </Link>
                     </nav>
 
                     {/* Right Side - Auth Actions */}
