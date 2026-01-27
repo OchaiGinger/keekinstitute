@@ -18,7 +18,6 @@ export async function completeOnboardingAction(
 ) {
     try {
         const convex = getConvexClient();
-    try {
         // Validate with Zod
         const validated = onboardingSchema.parse(data)
 
@@ -55,6 +54,7 @@ export async function completeOnboardingAction(
 
 export async function getUserRoleAction(userEmail: string) {
     try {
+        const convex = getConvexClient();
         // Query user by email via Convex
         const user = await convex.query(api.user.getByEmail, {
             email: userEmail,
@@ -66,4 +66,3 @@ export async function getUserRoleAction(userEmail: string) {
         return { success: false, role: null }
     }
 }
-

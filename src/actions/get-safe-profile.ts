@@ -92,6 +92,7 @@ export default async function getSafeProfile() {
       // Try to create user if fetch failed
       const userRole = isAdmin ? "admin" : "student";
       try {
+        const convex = getConvexClient();
         await convex.mutation(api.user.create, {
           authUserId: userId,
           email: userEmail,
