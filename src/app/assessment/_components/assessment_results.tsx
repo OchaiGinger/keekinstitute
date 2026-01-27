@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 import { TECH_PATHS } from "../questions";
 import { useState } from "react";
 
@@ -33,7 +33,7 @@ export default function AssessmentResults({
     onComplete,
 }: AssessmentResultsProps) {
     const [isRetaking, setIsRetaking] = useState(false);
-    const deleteAssessment = useMutation(api.assessment.deleteLatestAssessment);
+    const deleteAssessment = useMutation(api.assessment.deleteLatestAssessmentByUserId);
 
     const recommendedPath =
         TECH_PATHS[assessment.recommendedPath as keyof typeof TECH_PATHS];
@@ -44,7 +44,7 @@ export default function AssessmentResults({
     const handleRetake = async () => {
         setIsRetaking(true);
         try {
-            await deleteAssessment({ authUserId: assessment.authUserId });
+            await deleteAssessment({ userId: assessment.userId });
             onRetake();
         } catch (err) {
             console.error("Failed to delete assessment:", err);
