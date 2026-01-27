@@ -1,3 +1,6 @@
+// Skip static generation to avoid Clerk initialization issues during build
+export const dynamic = 'force-dynamic'
+
 export default function NotFound() {
   return (
     <div style={{ 
