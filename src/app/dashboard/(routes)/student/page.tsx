@@ -1,18 +1,17 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/../convex/_generated/api";
+import { getConvexClient } from "@/lib/convex-client";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, ArrowRight } from "lucide-react";
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL || "");
-
 export default async function StudentPage() {
     const { userId } = await auth();
+    const convex = getConvexClient();
 
     // Protect: Only logged in users can access
     if (!userId) {
