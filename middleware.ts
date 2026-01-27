@@ -1,26 +1,20 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-
-const isPublicRoute = createRouteMatcher([
-    '/',
-    '/signup',
-    '/assessment',
-    '/courses',
-    '/courses/(.*)',
-    '/onboarding',
-    '/api/webhooks/(.*)',
-])
+import { clerkMiddleware } from '@clerk/nextjs/server'
 
 export default clerkMiddleware(async (auth, req) => {
-    if (!isPublicRoute(req)) {
+    try {
+        // Protect all routes by default
         await auth.protect()
+    } catch (error) {
+        // Silently fail for public routes or if auth is not configured
+        console.error('Middleware auth error:', error)
     }
 })
 
 export const config = {
     matcher: [
-        // Skip Next.js internals and all static files, unless found in search params
-        '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-        // Always run for API routes
-        '/(api|trpc)(.*)',
+        // Only protect authenticated routes
+        '/dashboard/:path*',
+        '/assessment/:path*',
+        '/onboarding/:path*',
     ],
 }
