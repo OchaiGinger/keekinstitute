@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button";
 import { handleGetStarted } from "@/actions/handle-get-started";
 
 const Navbar = async () => {
-    const { userId } = await auth();
+    let userId = null;
+    try {
+        const authResult = await auth();
+        userId = authResult?.userId || null;
+    } catch (error) {
+        // Auth not available - proceed without user info
+        console.log("[Navbar] Auth unavailable");
+    }
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/60">
