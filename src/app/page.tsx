@@ -9,16 +9,15 @@ export default async function Home() {
     const { userId } = await auth();
 
     // If user is signed in, redirect to dashboard
-    // Dashboard layout will handle role-based routing and onboarding checks
     if (userId) {
       return redirect("/dashboard");
     }
   } catch (error) {
-    console.log("[Home] Auth check failed, showing landing page");
-    // Auth failed or not ready - show landing page anyway
+    // Silently handle auth errors on public page
+    // This happens when Clerk is not fully initialized or env vars are missing
   }
 
-  // Show landing page for unsigned users or when auth fails
+  // Show landing page for unsigned users
   return <HeroContent />;
 }
 
