@@ -7,6 +7,9 @@ import ConvexClientProvider from '@/components/providers/ConvexClientProvider'
 import { ToastProvider } from '@/components/providers/toaster-provider'
 import Navbar from "@/components/Navbar";
 
+// Skip static generation for root layout to avoid Clerk initialization issues during build
+export const dynamic = 'force-dynamic';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
