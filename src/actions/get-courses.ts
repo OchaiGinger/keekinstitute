@@ -10,8 +10,18 @@ export async function getCourses(filters?: {
   categoryId?: string;
 }) {
   try {
-    const courses = await convex.query(api.courses.getAll, filters || {});
-    return courses;
+    const courses = await convex.query(api.courses.getAll, {});
+    // Client-side filtering based on parameters
+    let filtered = courses;
+    if (filters?.title) {
+      filtered = filtered.filter(course =>
+        course.title?.toLowerCase().includes(filters.title!.toLowerCase())
+      );
+    }
+    if (filters?.categoryId) {
+      filtered = filtered.filter(course => course.categoryId === filters.categoryId);
+    }
+    return filtered;
   } catch (error) {
     console.error("Error fetching courses:", error);
     return [];
