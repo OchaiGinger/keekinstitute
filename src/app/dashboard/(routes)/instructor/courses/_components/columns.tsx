@@ -1,6 +1,5 @@
 "use client"
 
-import { Course } from "@prisma/client"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, MoreHorizontal, Pencil } from "lucide-react"
 import Link from "next/link";
@@ -14,6 +13,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+
+interface Course {
+  _id: string;
+  id?: string;
+  title: string;
+  price?: number;
+  isPublished?: boolean;
+  [key: string]: any;
+}
 
 // 6:47:00 in Build a Course & LMS Platform:
 // https://youtu.be/Big_aFLmekI?t=24446
@@ -84,7 +92,7 @@ export const columns: ColumnDef<Course>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const { id } = row.original;
+      const { _id } = row.original;
 
       return (
         (<DropdownMenu>
@@ -95,7 +103,7 @@ export const columns: ColumnDef<Course>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <Link href={`/dashboard/instructor/courses/${id}`}>
+            <Link href={`/dashboard/instructor/courses/${_id}`}>
               <DropdownMenuItem>
                 <Pencil className="h-4 w-4 mr-2" />
                 Edit

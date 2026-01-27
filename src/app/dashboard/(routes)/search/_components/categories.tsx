@@ -1,6 +1,5 @@
 "use client";
 
-import { Category } from "@prisma/client";
 import {
   FcEngineering,
   FcFilmReel,
@@ -14,11 +13,18 @@ import { IconType } from "react-icons";
 
 import { CategoryItem } from "./category-item";
 
+interface Category {
+  _id: string;
+  id?: string;
+  name: string;
+  [key: string]: any;
+}
+
 interface CategoriesProps {
   items: Category[];
 }
 
-const iconMap: Record<Category["name"], IconType> = {
+const iconMap: Record<string, IconType> = {
   "Music": FcMusic,
   "Photography": FcOldTimeCamera,
   "Fitness": FcSportsMode,
@@ -35,10 +41,10 @@ export const Categories = ({
     <div className="flex items-center gap-x-2 overflow-x-auto pb-2">
       {items.map((item) => (
         <CategoryItem
-          key={item.id}
+          key={item._id}
           label={item.name}
           icon={iconMap[item.name]}
-          value={item.id}
+          value={item._id}
         />
       ))}
     </div>

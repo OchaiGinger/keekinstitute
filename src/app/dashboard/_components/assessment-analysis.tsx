@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useQuery } from "convex/react";
-import { api } from "../../../../../convex/_generated/api";
-import type { Id } from "../../../../../convex/_generated/dataModel";
+import { api } from "@/../convex/_generated/api";
+import type { Id } from "@/../convex/_generated/dataModel";
 import { TECH_PATHS } from "@/app/assessment/questions";
 import AssessmentModal from "./assessment-modal";
 
