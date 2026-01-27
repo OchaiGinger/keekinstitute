@@ -238,3 +238,21 @@ export const updateRole = mutation({
         return { updated: true, userId: args.userId, newRole: args.role };
     },
 });
+
+// ------------------- DELETE USER -------------------
+export const deleteUser = mutation({
+    args: {
+        userId: v.id("users"),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        await ctx.db.delete(args.userId);
+
+        return { deleted: true, userId: args.userId };
+    },
+});

@@ -53,12 +53,12 @@ export default async function getSafeProfile() {
       if (profile) {
         console.log("[getSafeProfile] Found profile in Convex with role:", profile.role);
         
-        // Check if admin status matches
-        const expectedRole = isAdmin ? "admin" : "student";
+        // Only override role if user is admin (by email)
+        // Otherwise preserve existing role (instructor, student, etc)
+        const expectedRole = isAdmin ? "admin" : profile.role;
         if (profile.role !== expectedRole) {
-          console.log("[getSafeProfile] Role mismatch - current:", profile.role, "expected:", expectedRole);
-          // Update role in memory and return
-          // The database will be updated on next request or when mutation is available
+          console.log("[getSafeProfile] Admin status changed - current:", profile.role, "expected:", expectedRole);
+          // Update role in memory
           profile.role = expectedRole;
           console.log("[getSafeProfile] Updated profile role in memory to:", expectedRole);
         }

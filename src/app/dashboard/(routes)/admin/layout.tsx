@@ -6,9 +6,6 @@ import { api } from "../../../../../convex/_generated/api"
 import { redirect } from "next/navigation"
 import { Loader } from "lucide-react"
 
-import DynamicSidebar from "../_components/dynamic-sidebar"
-import DashboardNavbar from "@/components/dashboard-navbar"
-
 export default function AdminLayout({
     children,
 }: {
@@ -43,15 +40,6 @@ export default function AdminLayout({
         redirect("/")
     }
 
-    return (
-        <div className="flex h-screen flex-col">
-            <DashboardNavbar />
-            <div className="flex flex-1 overflow-hidden">
-                <DynamicSidebar role="admin" />
-                <main className="flex-1 overflow-auto p-8">
-                    {children}
-                </main>
-            </div>
-        </div>
-    )
+    // Admin layout just renders children - navbar and sidebar come from parent dashboard layout
+    return children
 }
