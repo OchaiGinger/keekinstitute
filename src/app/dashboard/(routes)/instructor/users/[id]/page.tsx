@@ -2,7 +2,7 @@ import React from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-import { db } from "@/lib/db";
+import { getUserById } from "@/actions/get-user-by-id";
 import Link from "next/link";
 import { ArrowLeft, LayoutDashboard, Eye, Video } from "lucide-react";
 import { IconBadge } from "@/components/icon-badge";
@@ -24,11 +24,7 @@ const ProfileIdPage: React.FC<ProfileIdPageProps> = async ({ params }) => {
     return redirect("/dashboard/instructor/users/");
   }
 
-  const profile = await db.profile.findUnique({
-    where: {
-      id: params.id,
-    },
-  });
+  const profile = await getUserById(params.id);
 
   if (!profile) {
     return redirect("/dashboard/instructor/users/");
@@ -36,7 +32,7 @@ const ProfileIdPage: React.FC<ProfileIdPageProps> = async ({ params }) => {
 
   return (
     <div className="flex-1 p-6">
-      <MemberRoleForm initialData={profile} id={profile.id} />
+      <MemberRoleForm initialData={profile} id={profile._id} />
     </div>
   );
 };

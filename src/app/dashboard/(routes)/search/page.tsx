@@ -1,9 +1,9 @@
 import { auth } from "@clerk/nextjs/server";;
 import { redirect } from "next/navigation";
 
-import { db } from "@/lib/db";
 import { SearchInput } from "@/components/search-input";
 import { getCourses } from "@/actions/get-courses";
+import { getCategories } from "@/actions/get-categories";
 import { CoursesList } from "@/components/courses-list";
 
 import { Categories } from "./_components/categories";
@@ -24,11 +24,7 @@ const SearchPage = async ({
     return redirect("/");
   }
 
-  const categories = await db.category.findMany({
-    orderBy: {
-      name: "asc"
-    }
-  });
+  const categories = await getCategories();
 
   const courses = await getCourses({
     userId,

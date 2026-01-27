@@ -32,6 +32,14 @@ export const getByAuthId = query({
     },
 });
 
+// ------------------- GET USER BY ID -------------------
+export const getById = query({
+    args: { userId: v.id("users") },
+    handler: async (ctx, args) => {
+        return await ctx.db.get(args.userId);
+    },
+});
+
 // ------------------- GET SAFE PROFILE (for layouts) -------------------
 export const getSafeProfile = query({
     args: { authUserId: v.string() },
