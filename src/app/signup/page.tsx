@@ -6,7 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export const dynamic = "force-dynamic";
 
 export default async function SignUpPage() {
-    const { userId } = await auth();
+    let userId = null;
+    try {
+        const { userId: authUserId } = await auth();
+        userId = authUserId;
+    } catch (error) {
+        // Auth might not be available on public pages
+        console.log("[SignUpPage] Auth check failed");
+    }
 
     // Protect this page - only non-authenticated users can access
     if (userId) {
