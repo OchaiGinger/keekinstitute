@@ -41,7 +41,7 @@ export default function RootLayout({
           afterSignOutUrl="/" 
           signInUrl="/signup" 
           signUpUrl="/signup"
-          afterSignUpUrl="/dashboard"
+          signUpFallbackRedirectUrl="/dashboard"
         >
           <ConvexClientProvider>
             <ToastProvider />

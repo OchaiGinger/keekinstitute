@@ -6,6 +6,9 @@ export interface SafeProfile {
   lastName?: string;
   role?: "admin" | "instructor" | "student" | string;
   onboardingCompleted?: boolean;
+  isVerified?: boolean;
+  verificationId?: string;
+  verificationIdUsed?: boolean;
 }
 
 export interface Course {

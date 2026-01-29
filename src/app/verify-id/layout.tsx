@@ -1,13 +1,12 @@
-import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { validateUserExists } from "@/actions/validate-user-exists";
 
-export default async function StudentOnboardingLayout({
+export default async function VerifyIdLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Simple auth check - just ensure user is logged in
   const { userId } = await auth();
 
   if (!userId) {
@@ -17,10 +16,9 @@ export default async function StudentOnboardingLayout({
   // Validate that the user still exists (they might have been deleted by admin)
   const userExists = await validateUserExists();
   if (!userExists) {
-    console.log("[StudentOnboardingLayout] User deleted, redirecting to /");
+    console.log("[VerifyIdLayout] User deleted, redirecting to /");
     redirect("/");
   }
 
-  // Don't use the dashboard layout - just render the form directly
   return <>{children}</>;
 }

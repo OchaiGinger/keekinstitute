@@ -85,6 +85,34 @@ export const getByEmail = query({
     },
 });
 
+// ------------------- UPDATE USER -------------------
+export const update = mutation({
+    args: {
+        userId: v.id("users"),
+        clerkId: v.optional(v.string()),
+        email: v.optional(v.string()),
+        firstName: v.optional(v.string()),
+        lastName: v.optional(v.string()),
+        role: v.optional(v.union(v.literal("admin"), v.literal("instructor"), v.literal("student"))),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        const updates: any = { updatedAt: Date.now() };
+        if (args.clerkId !== undefined) updates.clerkId = args.clerkId;
+        if (args.email !== undefined) updates.email = args.email;
+        if (args.firstName !== undefined) updates.firstName = args.firstName;
+        if (args.lastName !== undefined) updates.lastName = args.lastName;
+        if (args.role !== undefined) updates.role = args.role;
+
+        await ctx.db.patch(args.userId, updates);
+        return await ctx.db.get(args.userId);
+    },
+});
+
 // ------------------- COMPLETE ONBOARDING -------------------
 export const completeOnboarding = mutation({
     args: {
@@ -258,24 +286,6 @@ export const updateRole = mutation({
     },
 });
 
-// ------------------- DELETE USER -------------------
-export const deleteUser = mutation({
-    args: {
-        userId: v.id("users"),
-    },
-    handler: async (ctx, args) => {
-        const user = await ctx.db.get(args.userId);
-
-        if (!user) {
-            throw new Error("User not found");
-        }
-
-        await ctx.db.delete(args.userId);
-
-        return { deleted: true, userId: args.userId };
-    },
-});
-
 // ------------------- UPDATE USER PROFILE -------------------
 export const updateUserProfile = mutation({
     args: {
@@ -305,3 +315,125 @@ export const updateUserProfile = mutation({
         return { updated: true, userId: args.userId };
     },
 });
+// ------------------- GENERATE VERIFICATION ID (ADMIN) -------------------
+export const generateVerificationId = mutation({
+    args: { userId: v.id("users") },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+        if (!user) throw new Error("User not found");
+
+        // Generate ID with pattern: DD/MM/keek[sequential]
+        // Example: 26/01/keek12, 26/01/keek13, etc.
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        
+        // Get sequential number - count existing verifications today
+        const users = await ctx.db.query("users").collect();
+        const todaysIds = users
+            .filter((u) => {
+                if (!u.verificationId) return false;
+                return u.verificationId.startsWith(`${day}/${month}/`);
+            })
+            .length;
+        
+        const sequential = String(todaysIds + 1).padStart(2, '0');
+        const verificationId = `${day}/${month}/keek${sequential}`;
+
+        await ctx.db.patch(args.userId, {
+            verificationId,
+            isVerified: true,
+        });
+
+        return { verificationId, userId: args.userId };
+    },
+});
+
+// ------------------- VERIFY WITH ID (STUDENT) -------------------
+export const verifyWithId = mutation({
+    args: { clerkId: v.string(), verificationId: v.string() },
+    handler: async (ctx, args) => {
+        const users = await ctx.db.query("users").collect();
+        const user = users.find((u) => u.clerkId === args.clerkId);
+
+        if (!user) throw new Error("User not found");
+
+        // Check if the verification ID matches
+        if (user.verificationId !== args.verificationId) {
+            throw new Error("Invalid verification ID");
+        }
+
+        if (!user.isVerified) {
+            throw new Error("User not verified by admin");
+        }
+
+        // Mark as used
+        await ctx.db.patch(user._id, {
+            verificationIdUsed: true,
+        });
+
+        return { success: true, userId: user._id };
+    },
+});
+
+// ------------------- GET ALL STUDENTS (ADMIN) -------------------
+export const getAllStudents = query({
+    handler: async (ctx) => {
+        const students = await ctx.db
+            .query("users")
+            .filter((q) => q.eq(q.field("role"), "student"))
+            .collect();
+
+        return students.map((student) => ({
+            _id: student._id,
+            clerkId: student.clerkId,
+            email: student.email,
+            firstName: student.firstName,
+            lastName: student.lastName,
+            isVerified: student.isVerified || false,
+            verificationId: student.verificationId,
+            verificationIdUsed: student.verificationIdUsed || false,
+            onboardingCompleted: student.onboardingCompleted || false,
+            createdAt: student.createdAt,
+        }));
+    },
+});
+
+// ------------------- DELETE USER (ADMIN) -------------------
+export const deleteUser = mutation({
+    args: { userId: v.id("users") },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+        if (!user) throw new Error("User not found");
+
+        // Delete all assessments for this user
+        const assessments = await ctx.db.query("assessments").collect();
+        for (const assessment of assessments) {
+            if (assessment.userId === args.userId) {
+                await ctx.db.delete(assessment._id);
+            }
+        }
+
+        // Delete all enrollments for this user
+        const enrollments = await ctx.db.query("enrollments").collect();
+        for (const enrollment of enrollments) {
+            if (enrollment.userId === args.userId) {
+                await ctx.db.delete(enrollment._id);
+            }
+        }
+
+        // Delete all progress records for this user
+        const progresses = await ctx.db.query("userProgress").collect();
+        for (const progress of progresses) {
+            if (progress.userId === args.userId) {
+                await ctx.db.delete(progress._id);
+            }
+        }
+
+        // Delete the user itself
+        await ctx.db.delete(args.userId);
+
+        return { success: true, userId: args.userId };
+    },
+});
+

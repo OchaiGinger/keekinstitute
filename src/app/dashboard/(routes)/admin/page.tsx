@@ -22,6 +22,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Users } from "lucide-react";
+import AdminStudentManagement from "@/app/dashboard/_components/admin-student-management";
 
 type UserRole = "admin" | "instructor" | "student";
 
@@ -226,7 +227,7 @@ export default function AdminDashboard() {
             {/* Users Lists */}
             <div className="grid grid-cols-1 gap-6">
                 <UsersList title="Instructors" users={instructors || []} role="instructor" />
-                <UsersList title="Students" users={students || []} role="student" />
+                <AdminStudentManagement />
                 <UsersList title="Admins" users={admins || []} role="admin" />
             </div>
         </div>

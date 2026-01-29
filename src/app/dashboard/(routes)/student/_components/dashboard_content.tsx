@@ -39,7 +39,7 @@ export default function DashboardContent({ userId, userName, userEmail }: Dashbo
                 email: userEmail,
                 firstName: userName,
             }).then(() => {
-                router.push("/onboarding");
+                router.push("/student-onboarding");
             });
             return;
         }
