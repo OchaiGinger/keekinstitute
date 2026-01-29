@@ -33,4 +33,3 @@ export default async function InstructorLayout({
     // Just render children
     return <>{children}</>
 }
-}

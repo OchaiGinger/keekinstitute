@@ -27,9 +27,9 @@ export async function completeInstructorOnboardingAction(data: InstructorOnboard
         // Validate with Zod
         const validated = instructorOnboardingSchema.parse(data)
 
-        // Get user by auth ID
-        const userByAuthId = await convex.query(api.user.getByAuthId, {
-            authUserId: userId,
+        // Get user by clerk ID
+        const userByAuthId = await convex.query(api.user.getByClerkId, {
+            clerkId: userId,
         })
 
         if (!userByAuthId) {

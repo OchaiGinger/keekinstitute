@@ -21,8 +21,8 @@ export default function DashboardContent({ userId, userName, userEmail }: Dashbo
 
     // Fetch Convex user record
     const userRecord = useQuery(
-        api.user.getByAuthId,
-        userId ? { authUserId: userId } : "skip"
+        api.user.getByClerkId,
+        userId ? { clerkId: userId } : "skip"
     );
 
     // Create user mutation
@@ -35,9 +35,9 @@ export default function DashboardContent({ userId, userName, userEmail }: Dashbo
         if (userRecord === null) {
             // User doesn't exist in Convex, create them
             createUser({
-                authUserId: userId,
+                clerkId: userId,
                 email: userEmail,
-                name: userName,
+                firstName: userName,
             }).then(() => {
                 router.push("/onboarding");
             });

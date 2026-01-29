@@ -16,8 +16,8 @@ export default function AssessmentPage() {
 
     // Fetch user record to get userId
     const userRecord = useQuery(
-        api.user.getByAuthId,
-        userId ? { authUserId: userId } : "skip"
+        api.user.getByClerkId,
+        userId ? { clerkId: userId } : "skip"
     );
 
     // Fetch latest assessment if user exists

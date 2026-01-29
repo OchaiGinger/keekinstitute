@@ -20,8 +20,8 @@ export default async function AssessmentAnalysisPage() {
     // For this page, we need to get the user record to fetch their assessment
     let userRecord: any = null;
     try {
-        userRecord = await convex.query(api.user.getByAuthId, {
-            authUserId: userId,
+        userRecord = await convex.query(api.user.getByClerkId, {
+            clerkId: userId,
         });
     } catch (error) {
         console.error("Error fetching user:", error);

@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "utfs.io",
       },
+      {
+        protocol: "https",
+        hostname: "*.clerk.accounts.dev",
+      },
     ],
   },
   // Increase the timeout for static generation

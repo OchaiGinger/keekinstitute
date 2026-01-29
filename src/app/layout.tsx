@@ -9,7 +9,7 @@ import Navbar from "@/components/Navbar";
 
 // Skip static generation for root layout to avoid Clerk initialization issues during build
 export const dynamic = 'force-dynamic';
-
+export const revalidate = 0;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +37,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClerkProvider>
+        <ClerkProvider 
+          afterSignOutUrl="/" 
+          signInUrl="/signup" 
+          signUpUrl="/signup"
+          afterSignUpUrl="/dashboard"
+        >
           <ConvexClientProvider>
             <ToastProvider />
             <Navbar />
@@ -48,7 +53,6 @@ export default function RootLayout({
         </ClerkProvider>
       </body>
     </html>
-
   );
 }
 

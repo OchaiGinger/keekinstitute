@@ -24,8 +24,8 @@ export default async function StudentPage() {
     let enrolledCourses: any[] = [];
 
     try {
-        userRecord = await convex.query(api.user.getByAuthId, {
-            authUserId: userId,
+        userRecord = await convex.query(api.user.getByClerkId, {
+            clerkId: userId,
         });
 
         if (userRecord) {

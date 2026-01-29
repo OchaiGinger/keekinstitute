@@ -14,8 +14,8 @@ export default function DashboardPage() {
     const [redirected, setRedirected] = useState(false);
 
     const userRecord = useQuery(
-        api.user.getByAuthId,
-        userId ? { authUserId: userId } : "skip"
+        api.user.getByClerkId,
+        userId ? { clerkId: userId } : "skip"
     );
 
     useEffect(() => {

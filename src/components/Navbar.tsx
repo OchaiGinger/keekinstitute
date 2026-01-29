@@ -1,19 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
-import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { handleGetStarted } from "@/actions/handle-get-started";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
-const Navbar = async () => {
-    let userId = null;
-    try {
-        const authResult = await auth();
-        userId = authResult?.userId || null;
-    } catch (error) {
-        // Auth not available - proceed without user info
-        console.log("[Navbar] Auth unavailable");
-    }
-
+const Navbar = () => {
     return (
         <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/60">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -35,29 +25,28 @@ const Navbar = async () => {
 
                     {/* Right Side - Auth Actions */}
                     <div className="flex items-center gap-4">
-                        {userId ? (
-                            <>
-                                <form action={handleGetStarted}>
-                                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                                        Dashboard
-                                    </Button>
-                                </form>
-                                <UserButton 
-                                    afterSignOutUrl="/"
-                                    appearance={{
-                                        elements: {
-                                            avatarBox: "h-10 w-10",
-                                        },
-                                    }}
-                                />
-                            </>
-                        ) : (
+                        <SignedIn>
+                            <form action={handleGetStarted}>
+                                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                                    Dashboard
+                                </Button>
+                            </form>
+                            <UserButton 
+                                afterSignOutUrl="/"
+                                appearance={{
+                                    elements: {
+                                        avatarBox: "h-10 w-10",
+                                    },
+                                }}
+                            />
+                        </SignedIn>
+                        <SignedOut>
                             <form action={handleGetStarted}>
                                 <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                                     Get Started
                                 </Button>
                             </form>
-                        )}
+                        </SignedOut>
                     </div>
                 </div>
             </div>

@@ -23,8 +23,8 @@ export default function ThemeSwitch() {
 
   // Get user record from Convex to check role
   const userRecord = useQuery(
-    api.user.getByAuthId,
-    localUserId ? { authUserId: localUserId } : "skip"
+    api.user.getByClerkId,
+    localUserId ? { clerkId: localUserId } : "skip"
   );
 
   React.useEffect(() => {

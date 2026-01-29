@@ -1,20 +1,22 @@
-import { clerkMiddleware } from '@clerk/nextjs/server'
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+
+const isProtectedRoute = createRouteMatcher([
+  '/dashboard(.*)',
+  '/assessment(.*)',
+])
 
 export default clerkMiddleware(async (auth, req) => {
-    try {
-        // Protect all routes by default
-        await auth.protect()
-    } catch (error) {
-        // Silently fail for public routes or if auth is not configured
-        console.error('Middleware auth error:', error)
-    }
+  if (isProtectedRoute(req)) {
+    // Protect dashboard and assessment routes
+    await auth.protect()
+  }
 })
 
 export const config = {
-    matcher: [
-        // Only protect authenticated routes
-        '/dashboard/:path*',
-        '/assessment/:path*',
-        '/onboarding/:path*',
-    ],
+  matcher: [
+    // Match all routes except static assets
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|png|gif|svg|ttf|woff2?|ico|webp|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 }

@@ -4,22 +4,25 @@ import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function SignUpPage() {
     let userId = null;
     try {
         const { userId: authUserId } = await auth();
         userId = authUserId;
+        console.log("[SignUpPage] Auth check - userId:", userId);
     } catch (error) {
         // Auth might not be available on public pages
-        console.log("[SignUpPage] Auth check failed");
+        console.log("[SignUpPage] Auth check failed", error);
     }
 
     // Protect this page - only non-authenticated users can access
     if (userId) {
         // User is logged in, redirect to dashboard
         // Dashboard layout will check onboarding status and role
-        redirect("/dashboard");
+        console.log("[SignUpPage] User authenticated, redirecting to dashboard");
+        return redirect("/dashboard");
     }
 
     return (

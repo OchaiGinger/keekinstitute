@@ -30,10 +30,10 @@ export async function completeStudentOnboardingAction(data: StudentOnboardingDat
         const validated = studentOnboardingSchema.parse(data)
         console.log("[completeStudentOnboardingAction] Validated data:", validated)
 
-        // Get user by auth ID
-        console.log("[completeStudentOnboardingAction] Querying user by authId:", userId)
-        const userByAuthId = await convex.query(api.user.getByAuthId, {
-            authUserId: userId,
+        // Get user by clerk ID
+        console.log("[completeStudentOnboardingAction] Querying user by clerkId:", userId)
+        const userByAuthId = await convex.query(api.user.getByClerkId, {
+            clerkId: userId,
         })
         console.log("[completeStudentOnboardingAction] User found:", userByAuthId?._id)
 

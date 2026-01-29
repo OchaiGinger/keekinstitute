@@ -4,31 +4,34 @@ import { v } from "convex/values";
 // ------------------- CREATE USER -------------------
 export const create = mutation({
     args: {
-        authUserId: v.string(),
+        clerkId: v.string(),
         email: v.string(),
-        name: v.optional(v.string()),
+        firstName: v.optional(v.string()),
+        lastName: v.optional(v.string()),
         role: v.optional(v.union(v.literal("admin"), v.literal("instructor"), v.literal("student"))),
     },
     handler: async (ctx, args) => {
         const _id = await ctx.db.insert("users", {
-            authUserId: args.authUserId,
+            clerkId: args.clerkId,
             email: args.email,
-            name: args.name,
+            firstName: args.firstName,
+            lastName: args.lastName,
             role: args.role || "student", // Default to student
             onboardingCompleted: false,
             createdAt: Date.now(),
+            updatedAt: Date.now(),
         });
         return _id;
     },
 });
 
-// ------------------- GET USER BY AUTH ID -------------------
-export const getByAuthId = query({
-    args: { authUserId: v.string() },
+// ------------------- GET USER BY CLERK ID -------------------
+export const getByClerkId = query({
+    args: { clerkId: v.string() },
     handler: async (ctx, args) => {
-        // Fallback implementation without relying on a DB index.
         const users = await ctx.db.query("users").collect();
-        return users.find((u) => u.authUserId === args.authUserId) ?? null;
+        // Check both clerkId and authUserId for backward compatibility
+        return users.find((u) => u.clerkId === args.clerkId || u.authUserId === args.clerkId) ?? null;
     },
 });
 
@@ -42,10 +45,11 @@ export const getById = query({
 
 // ------------------- GET SAFE PROFILE (for layouts) -------------------
 export const getSafeProfile = query({
-    args: { authUserId: v.string() },
+    args: { clerkId: v.string() },
     handler: async (ctx, args) => {
         const users = await ctx.db.query("users").collect();
-        const user = users.find((u) => u.authUserId === args.authUserId);
+        // Check both clerkId and authUserId for backward compatibility
+        const user = users.find((u) => u.clerkId === args.clerkId || u.authUserId === args.clerkId);
 
         if (!user) {
             return null;
@@ -53,9 +57,10 @@ export const getSafeProfile = query({
 
         return {
             _id: user._id,
-            authUserId: user.authUserId,
+            clerkId: user.clerkId || user.authUserId,
             email: user.email,
-            name: user.name,
+            firstName: user.firstName || user.name,
+            lastName: user.lastName,
             role: user.role,
             onboardingCompleted: user.onboardingCompleted,
         };
@@ -83,35 +88,40 @@ export const getByEmail = query({
 // ------------------- COMPLETE ONBOARDING -------------------
 export const completeOnboarding = mutation({
     args: {
-        authUserId: v.string(),
+        clerkId: v.string(),
         email: v.string(),
-        name: v.string(),
+        firstName: v.string(),
+        lastName: v.optional(v.string()),
         role: v.optional(v.union(v.literal("admin"), v.literal("instructor"), v.literal("student"))),
     },
     handler: async (ctx, args) => {
         // Try to find existing user (without requiring an index)
         const users = await ctx.db.query("users").collect();
-        const user = users.find((u) => u.authUserId === args.authUserId);
+        const user = users.find((u) => u.clerkId === args.clerkId);
 
         if (user) {
             await ctx.db.patch(user._id, {
-                name: args.name,
+                firstName: args.firstName,
+                lastName: args.lastName,
                 role: args.role || user.role,
                 onboardingCompleted: true,
                 onboardingCompletedAt: Date.now(),
+                updatedAt: Date.now(),
             });
             return { updated: true, userId: user._id };
         }
 
         // If no user exists, create and mark onboarding complete
         const _id = await ctx.db.insert("users", {
-            authUserId: args.authUserId,
+            clerkId: args.clerkId,
             email: args.email,
-            name: args.name,
+            firstName: args.firstName,
+            lastName: args.lastName,
             role: args.role || "student",
             onboardingCompleted: true,
             onboardingCompletedAt: Date.now(),
             createdAt: Date.now(),
+            updatedAt: Date.now(),
         });
 
         return { created: true, userId: _id };
@@ -121,7 +131,7 @@ export const completeOnboarding = mutation({
 // ------------------- UPDATE INSTRUCTOR PROFILE -------------------
 export const updateInstructorProfile = mutation({
     args: {
-        authUserId: v.string(),
+        clerkId: v.string(),
         specialization: v.string(),
         bio: v.optional(v.string()),
         qualifications: v.optional(v.string()),
@@ -129,7 +139,7 @@ export const updateInstructorProfile = mutation({
     },
     handler: async (ctx, args) => {
         const users = await ctx.db.query("users").collect();
-        const user = users.find((u) => u.authUserId === args.authUserId);
+        const user = users.find((u) => u.clerkId === args.clerkId);
 
         if (!user) {
             throw new Error("User not found");
@@ -140,6 +150,7 @@ export const updateInstructorProfile = mutation({
             bio: args.bio,
             qualifications: args.qualifications,
             yearsOfExperience: args.yearsOfExperience,
+            updatedAt: Date.now(),
         });
 
         return { updated: true, userId: user._id };
@@ -213,7 +224,7 @@ export const updateInstructorOnboarding = mutation({
         }
 
         await ctx.db.patch(args.userId, {
-            name: args.fullName,
+            firstName: args.fullName,
             specialization: args.specialization,
             bio: args.bio,
             yearsOfExperience: parseInt(args.experience, 10) || 0,

@@ -25,7 +25,7 @@ export const cleanupOldAssessments = mutation({
 /* ---------------- SUBMIT / RETAKE ASSESSMENT ---------------- */
 export const submitAssessment = mutation({
     args: {
-        authUserId: v.string(),
+        clerkId: v.string(),
         recommendedPath: v.string(),
         pathScores: v.object({
             frontend: v.number(),
@@ -44,9 +44,9 @@ export const submitAssessment = mutation({
         analysis: v.string(),
     },
     handler: async (ctx, args) => {
-        // Find user by authUserId
+        // Find user by clerkId
         const users = await ctx.db.query("users").collect();
-        const user = users.find((u) => u.authUserId === args.authUserId);
+        const user = users.find((u) => u.clerkId === args.clerkId);
         if (!user) throw new Error("User not found");
 
         // Find existing assessment for this user

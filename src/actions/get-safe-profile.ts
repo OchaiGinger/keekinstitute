@@ -20,9 +20,9 @@ export default async function getSafeProfile() {
     try {
       const convex = getConvexClient();
       
-      // Try to fetch user from Convex
+      // Try to fetch user from Convex using clerkId
       const profile = await convex.query(api.user.getSafeProfile, {
-        authUserId: userId,
+        clerkId: userId,
       });
 
       if (profile) {
@@ -39,17 +39,19 @@ export default async function getSafeProfile() {
       
       try {
         await convex.mutation(api.user.create, {
-          authUserId: userId,
+          clerkId: userId,
           email: userEmail,
-          name: clerkUser?.firstName || "",
+          firstName: clerkUser?.firstName || "",
+          lastName: clerkUser?.lastName || "",
           role: userRole,
         });
         
         return {
           _id: "" as any,
-          authUserId: userId,
+          clerkId: userId,
           email: userEmail,
-          name: clerkUser?.firstName || "",
+          firstName: clerkUser?.firstName || "",
+          lastName: clerkUser?.lastName || "",
           role: userRole,
           onboardingCompleted: false,
         };

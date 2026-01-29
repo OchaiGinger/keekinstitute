@@ -4,9 +4,12 @@ import { v } from "convex/values";
 export default defineSchema({
   // ==================== USERS ====================
   users: defineTable({
-    authUserId: v.string(), // Clerk user ID
+    clerkId: v.optional(v.string()), // Make optional for backward compatibility
+    authUserId: v.optional(v.string()), // Keep old field for migration
     email: v.string(),
-    name: v.optional(v.string()),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    name: v.optional(v.string()), // Keep for backward compatibility
     role: v.union(v.literal("admin"), v.literal("instructor"), v.literal("student")), // User role
     onboardingCompleted: v.optional(v.boolean()),
     onboardingCompletedAt: v.optional(v.number()),
@@ -21,7 +24,9 @@ export default defineSchema({
     qualifications: v.optional(v.string()),
     yearsOfExperience: v.optional(v.number()),
     createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
   })
+    .index("by_clerkId", ["clerkId"])
     .index("by_authUserId", ["authUserId"])
     .index("by_email", ["email"])
     .index("by_role", ["role"]),
@@ -128,9 +133,13 @@ export default defineSchema({
 
   // ==================== ONBOARDINGS ====================
   onboardings: defineTable({
-    authUserId: v.string(),
+    clerkId: v.optional(v.string()),
+    authUserId: v.optional(v.string()),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
     name: v.optional(v.string()),
     completedAt: v.number(),
   })
+    .index("by_clerkId", ["clerkId"])
     .index("by_authUserId", ["authUserId"]),
 });
