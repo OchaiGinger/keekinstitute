@@ -14,7 +14,13 @@ export default async function getSafeProfile() {
       return null;
     }
 
-    const clerkUser = await currentUser();
+    let clerkUser = null;
+    try {
+      clerkUser = await currentUser();
+    } catch (error) {
+      console.log("[getSafeProfile] Could not fetch currentUser:", error);
+      // Continue with basic email lookup
+    }
     const userEmail = clerkUser?.emailAddresses?.[0]?.emailAddress || "";
 
     try {

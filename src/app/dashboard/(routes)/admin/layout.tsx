@@ -7,25 +7,20 @@ export default async function AdminLayout({
 }: {
     children: React.ReactNode
 }) {
-    try {
-        const { userId } = await auth()
-        
-        if (!userId) {
-            redirect("/sign-in")
-        }
+    const { userId } = await auth()
+    
+    if (!userId) {
+        redirect("/sign-in")
+    }
 
-        const profile = await getSafeProfile()
+    const profile = await getSafeProfile()
 
-        if (!profile) {
-            redirect("/")
-        }
+    if (!profile) {
+        redirect("/")
+    }
 
-        // If profile exists and role is not admin, redirect
-        if (profile.role !== "admin") {
-            redirect("/")
-        }
-    } catch (error) {
-        console.error("[AdminLayout] Error:", error)
+    // If profile exists and role is not admin, redirect
+    if (profile.role !== "admin") {
         redirect("/")
     }
 

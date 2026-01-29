@@ -28,9 +28,10 @@ export async function completeOnboardingAction(
 
         // Call Convex mutation via ConvexHttpClient
         const result = await convex.mutation(api.user.completeOnboarding, {
-            authUserId: clerkUserId,
+            clerkId: clerkUserId,
             email: userEmail,
-            name: validated.name,
+            firstName: validated.name.split(" ")[0],
+            lastName: validated.name.split(" ").slice(1).join(" "),
             role: userByEmail?.role, // Pass the role from email lookup
         })
 

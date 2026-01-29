@@ -101,7 +101,7 @@ export default function AssessmentForm({ onComplete }: AssessmentFormProps) {
 
             // Submit to Convex
             await (submitAssessment as any)({
-                authUserId: user?.id,
+                clerkId: user?.id,
                 recommendedPath: analysisResult.recommendedPath,
                 pathScores: analysisResult.pathScores,
                 analysis: analysisResult.analysis,

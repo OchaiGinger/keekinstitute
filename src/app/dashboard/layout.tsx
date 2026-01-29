@@ -20,9 +20,12 @@ const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
   }
 
   // Redirect students to onboarding if they haven't completed it
+  // BUT don't redirect if they're already on the onboarding page
   if (safeProfile.role === "student" && !safeProfile.onboardingCompleted) {
+    // Check if current path is not already the onboarding page
+    // For now, just allow the redirect - the onboarding layout will prevent the loop
     console.log("[DashboardLayout] Student without onboarding, redirecting to onboarding");
-    return redirect("/dashboard/student/onboarding");
+    return redirect("/student-onboarding");
   }
   
   console.log("[DashboardLayout] Rendering dashboard for role:", safeProfile.role);

@@ -1,8 +1,9 @@
 export interface SafeProfile {
   _id: any;
-  authUserId: string;
+  clerkId?: string;
   email: string;
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   role?: "admin" | "instructor" | "student" | string;
   onboardingCompleted?: boolean;
 }

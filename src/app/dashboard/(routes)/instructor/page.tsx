@@ -13,7 +13,7 @@ export default function InstructorPage() {
 
     const profile = useQuery(
         api.user.getSafeProfile,
-        user?.id ? { authUserId: user.id } : "skip"
+        user?.id ? { clerkId: user.id } : "skip"
     );
 
     const courses = useQuery(api.courses.getPublished);
@@ -23,7 +23,7 @@ export default function InstructorPage() {
             {/* Welcome Section */}
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                    Welcome back, {profile?.name}
+                    Welcome back, {profile?.firstName || "Instructor"}
                 </h1>
                 <p className="text-muted-foreground mt-2">
                     Manage your courses, students, and track your teaching analytics

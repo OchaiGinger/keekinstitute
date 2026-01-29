@@ -81,7 +81,7 @@ export default function StudentOnboardingForm() {
         }
 
         console.log("[Form] Onboarding complete, redirecting to assessment...");
-        router.replace("/dashboard/student/assessment");
+        router.replace("/assessment");
       } catch (error) {
         console.error("[Form] Unexpected error:", error);
         form.setError("root", {

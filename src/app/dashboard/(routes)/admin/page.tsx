@@ -61,7 +61,7 @@ export default function AdminDashboard() {
             // Call the mutation to create the user with just email and role
             // Name will be filled in during their onboarding
             await createUser({
-                authUserId: tempAuthId,
+                clerkId: tempAuthId,
                 email: email,
                 role: role,
             });
