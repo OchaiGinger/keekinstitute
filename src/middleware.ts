@@ -1,22 +1,30 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-// Routes that REQUIRE authentication
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/assessment(.*)",
 ]);
 
-export default clerkMiddleware((auth, req) => {
-  // Protect only selected routes
-  if (isProtectedRoute(req)) {
-    auth.protect();
+export default clerkMiddleware(async (auth, req) => {
+  if (!isProtectedRoute(req)) {
+    return NextResponse.next();
   }
+
+  const { userId } = await auth();
+
+  // Not signed in → redirect to Clerk sign-in
+  if (!userId) {
+    const signInUrl = new URL("/sign-in", req.url);
+    return NextResponse.redirect(signInUrl);
+  }
+
+  return NextResponse.next();
 });
 
-// Run middleware on all app + API routes (excluding static assets)
 export const config = {
   matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|png|gif|svg|ttf|woff2?|ico|webp|webmanifest)).*)",
+    "/((?!_next|.*\\.(?:css|js|json|png|jpg|jpeg|gif|svg|ico|woff2?|ttf)).*)",
     "/(api|trpc)(.*)",
   ],
 };
