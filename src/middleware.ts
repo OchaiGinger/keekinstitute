@@ -1,22 +1,22 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
+// Routes that REQUIRE authentication
 const isProtectedRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/assessment(.*)',
-])
+  "/dashboard(.*)",
+  "/assessment(.*)",
+]);
 
-export default clerkMiddleware(async (auth, req) => {
+export default clerkMiddleware((auth, req) => {
+  // Protect only selected routes
   if (isProtectedRoute(req)) {
-    // Protect dashboard and assessment routes
-    await auth.protect()
+    auth.protect();
   }
-})
+});
 
+// Run middleware on all app + API routes (excluding static assets)
 export const config = {
   matcher: [
-    // Match all routes except static assets
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|png|gif|svg|ttf|woff2?|ico|webp|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|png|gif|svg|ttf|woff2?|ico|webp|webmanifest)).*)",
+    "/(api|trpc)(.*)",
   ],
-}
+};
